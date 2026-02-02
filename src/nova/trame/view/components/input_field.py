@@ -56,12 +56,6 @@ class InputField(AbstractElement):
             if "[" in field_name:
                 index_field_name = re.sub(r"\[.*?\]", "[0]", field_name)
                 field_info = get_field_info(f"{object_name_in_state}.{index_field_name}")
-                if "[" in field_name and "[index]" not in field_name:
-                    field_info = None
-                    logger.warning(
-                        f"{field}: validation ignored. We currently only "
-                        f"support single loop with index variable that should be called 'index'"
-                    )
             else:
                 field_info = get_field_info(field)
         except Exception as _:

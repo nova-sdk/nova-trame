@@ -352,6 +352,9 @@ class ComponentTab:
             vuetify.VCardTitle("Validation")
             with vuetify.VForm():
                 with GridLayout(classes="mb-4", columns=3, width=600, valign="center"):
+                    InputField(v_model="config.validation_test[0]", type="number")
+                    InputField(v_model="config.validation_test[1]", type="number")
+                    InputField(v_model="config.validation_test[2]", type="number")
                     InputField(label="Required Field", required=True)
                     InputField(label="Optional Field")
                     InputField(

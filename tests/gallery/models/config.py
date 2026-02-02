@@ -30,7 +30,17 @@ class Config(BaseModel):
         description="This field is throttled and will only update its state every 1 second.",
         title="Throttled Field",
     )
+    validation_test: List[int] = Field(default=[0, 0, 0], title="Set Less Than 0 For Error")
     value: int = Field(default=0, description="This field is validated via Pydantic.", title="Pydantic Field")
+
+    @field_validator("validation_test", mode="after")
+    @classmethod
+    def validate_ge_zero(cls, values: List[int]) -> List[int]:
+        for index, value in enumerate(values):
+            if value < 0:
+                raise ValueError(f"Error at index {index}: {value} is less than 0")
+
+        return values
 
     @field_validator("debounce", mode="after")
     @classmethod
