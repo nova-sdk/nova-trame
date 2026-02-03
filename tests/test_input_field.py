@@ -104,6 +104,18 @@ def test_pydantic_validation(driver: Firefox) -> None:
 
     assert error_message.startswith("Input should be a valid integer")
 
+    input_field_2 = WebDriverWait(driver, 10).until(
+        expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#validation-test"))
+    )
+    input_field_2.clear()
+    input_field_2.send_keys("-1")
+    sleep(1)
+    error_message = driver.execute_script("""
+        const messages_content = document.getElementById("validation-test-messages");
+
+        return messages_content.textContent;
+    """)
+
 
 def test_items_attributes() -> None:
     # items autopopulation start
