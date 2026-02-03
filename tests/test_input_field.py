@@ -116,6 +116,8 @@ def test_pydantic_validation(driver: Firefox) -> None:
         return messages_content.textContent;
     """)
 
+    assert "Error at indices 0,0" in error_message
+
 
 def test_items_attributes() -> None:
     # items autopopulation start
