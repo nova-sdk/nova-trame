@@ -157,9 +157,11 @@ class NeutronDataSelector(DataSelector):
             headers = "[{ title: 'Available Datafiles', key: 'title' },"
             for key in self._projection:
                 headers += f"{{title: '{self.create_projection_column_title(key)}', key: '{key}'}},"
-            headers += "]"
         else:
-            headers = "[{ title: 'Available Datafiles', key: 'title' }]"
+            headers = "[{ title: 'Available Datafiles', key: 'title' },"
+        if self._action:
+            headers += f"{{ title: '{self._action_text}', align: 'end', key: 'actions', sortable: false }}"
+        headers += "]"
 
         super().create_ui(headers=(headers,), **kwargs)
 

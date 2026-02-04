@@ -1,7 +1,7 @@
 """View Implementation for DataSelector."""
 
 from asyncio import ensure_future, sleep
-from typing import Any, List, Tuple, Union
+from typing import Any, Callable, List, Tuple, Union
 from warnings import warn
 
 from trame.app import get_server
@@ -29,6 +29,9 @@ class DataSelector(vuetify.VDataTableVirtual):
         self,
         v_model: Union[str, Tuple],
         directory: Union[str, Tuple],
+        action: Union[str, Callable] = "",
+        action_icon: Union[str, Tuple] = "mdi-gesture-tap",
+        action_text: str = "Action",
         clear_selection_on_directory_change: Union[bool, Tuple] = True,
         extensions: Union[List[str], Tuple, None] = None,
         prefix: Union[str, Tuple] = "",
@@ -107,6 +110,9 @@ class DataSelector(vuetify.VDataTableVirtual):
         else:
             self._v_model_name_in_state = v_model[0].split(".")[0]
 
+        self._action = action
+        self._action_icon = action_icon
+        self._action_text = action_text
         self._clear_selection = clear_selection_on_directory_change
         self._directory = directory
         self._last_directory = get_state_param(self.state, self._directory)
@@ -179,10 +185,21 @@ class DataSelector(vuetify.VDataTableVirtual):
                 with VBoxLayout(
                     classes="position-relative", column_span=1 if show_directories else 2, gap="0.5em", stretch=True
                 ):
-                    headers = kwargs.pop(
-                        "headers",
-                        ("[{ title: 'Available Datafiles', key: 'title' }]",),
-                    )
+                    if self._action:
+                        headers = kwargs.pop(
+                            "headers",
+                            (
+                                "["
+                                "  { title: 'Available Datafiles', key: 'title' },"
+                                f" {{ title: '{self._action_text}', align: 'end', key: 'actions', sortable: false }}"
+                                "]",
+                            ),
+                        )
+                    else:
+                        headers = kwargs.pop(
+                            "headers",
+                            ("[{ title: 'Available Datafiles', key: 'title' }]",),
+                        )
                     super().__init__(
                         ref="test",
                         v_model=self._v_model,
@@ -198,6 +215,12 @@ class DataSelector(vuetify.VDataTableVirtual):
                         **kwargs,
                     )
                     with self:
+                        with vuetify.Template(raw_attrs=['''v-slot:item.actions="{ item }"''']):
+                            with vuetify.VBtn(
+                                variant="text",
+                                v_on_click_stop=(self._action, "[item]") if callable(self._action) else self._action,
+                            ):
+                                vuetify.VIcon(icon=self._action_icon, size=16)
                         with vuetify.Template(v_slot_no_data=True):
                             html.Span("No files to display.")
                     if self._label:
