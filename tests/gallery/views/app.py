@@ -428,7 +428,7 @@ class ComponentTab:
             with GridLayout(columns=3, halign="center", valign="center"):
                 vuetify.VAlert("Alert")
                 with vuetify.VBadge():
-                    vuetify.VIcon("mdi-ab-testing")
+                    vuetify.VIcon("mdi-ab-testing", size="x-large")
                 vuetify.VProgressCircular(indeterminate=True)
                 vuetify.VProgressLinear(indeterminate=True)
                 with vuetify.VSnackbar(

@@ -1,7 +1,10 @@
 /* Global font sizes can't be set through the Vuetify configuration. */
 .v-theme--CompactTheme {
     $primary-color: #007833;
-    font-size: 0.75rem;
+
+    &:not(.v-icon) {
+        font-size: 0.75rem;
+    }
 
     html {
         overflow-y: auto;

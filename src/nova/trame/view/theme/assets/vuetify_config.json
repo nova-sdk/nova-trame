@@ -58,6 +58,9 @@
             "color": "primary",
             "prependIcon": false
         },
+        "VIcon": {
+            "size": "small"
+        },
         "VLabel": {
             "style": {
                 "opacity": 1.0
