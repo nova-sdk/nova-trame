@@ -1,126 +1,116 @@
-$primary-color: #007833;
-
-html {
-    overflow-y: auto;
-}
-
-.d-grid {
-    display: grid;
-    gap: 0.8em;
-    grid-auto-rows: auto;
-}
-
-.v-toolbar {
-    box-shadow: none !important;
-}
-
-.exit-button {
-    .v-btn__content,
-    .v-btn__prepend i {
-        font-size: 0.875rem !important;
-    }
-}
-
-.mpl-message, .ui-dialog-titlebar {
-    display: none !important;
-}
-
-.display-linebreaks {
-    white-space: pre-wrap;
-}
-
-.nova-pre-content:empty {
-    margin-bottom: 12px !important;
-}
-
-.nova-data-selector {
-    .v-autocomplete .v-field .v-field__input {
-        input {
-            min-width: 0;
-        }
-    }
-
-    .v-list-group {
-        --prepend-width: 12px !important;
-    }
-
-    .v-treeview.v-list {
-        --indent-padding: 0px !important;
-        overflow-x: auto;
-
-        & > .v-list-group > .v-list-item {
-            padding-left: 0 !important;
-        }
-
-        .v-list-item__content, .v-list-item-title {
-            overflow: visible;
-        }
-
-        .v-list-item-title span {
-            padding-right: 1em;
-        }
-    }
-
-    .v-data-table {
-        user-select: none;
-
-        .v-data-table-rows-no-data td {
-            padding: 0 0.75em;
-            text-align: left;
-        }
-
-        .v-data-table__td {
-            overflow: visible;
-            padding-right: 1em;
-        }
-
-        .v-table__wrapper {
-            min-width: 100%;
-            width: fit-content;
-        }
-    }
-}
-
-.nova-mpl * {
-    resize: none !important;
-}
-
-.nova-readonly {
-    .v-select__menu-icon {
-        display: none;
-    }
-}
-
-.v-window {
-    display: flex;
-    flex: 1 1;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
-
-    .v-window__container {
-        flex: 1 1;
-
-        .v-window-item {
-            flex: 1 1;
-        }
-    }
-}
-
-@media only screen and (max-width: 959px) {
-    .d-grid {
-        /* This forces all grid rows to have the same height. If one doesn't want this to happen, then they should use the box layouts. :) */
-        grid-auto-rows: 1fr;
-        grid-template-columns: repeat(1, 1fr) !important;
-    }
-
-    .d-grid-item {
-        grid-column: 1 / 1 !important;
-    }
-}
-
-/* Global font sizes can't be set through the Vuetify configuration. */
 .v-theme--CompactTheme {
-    font-size: 0.75rem;
+    $primary-color: #007833;
+
+    /* Global font sizes can't be set through the Vuetify configuration. */
+    &:not(.v-icon) {
+        font-size: 0.75rem;
+    }
+
+    html {
+        overflow-y: auto;
+    }
+
+    .d-grid {
+        display: grid;
+        gap: 0.8em;
+        grid-auto-rows: auto;
+    }
+
+    .v-toolbar {
+        box-shadow: none !important;
+    }
+
+    .exit-button {
+        .v-btn__content,
+        .v-btn__prepend i {
+            font-size: 0.875rem !important;
+        }
+    }
+
+    .mpl-message, .ui-dialog-titlebar {
+        display: none !important;
+    }
+
+    .display-linebreaks {
+        white-space: pre-wrap;
+    }
+
+    .nova-pre-content:empty {
+        margin-bottom: 12px !important;
+    }
+
+    .nova-data-selector {
+        .v-autocomplete .v-field .v-field__input {
+            input {
+                min-width: 0;
+            }
+        }
+
+        .v-list-group {
+            --prepend-width: 12px !important;
+        }
+
+        .v-treeview.v-list {
+            --indent-padding: 0px !important;
+            overflow-x: auto;
+
+            & > .v-list-group > .v-list-item {
+                padding-left: 0 !important;
+            }
+
+            .v-list-item__content, .v-list-item-title {
+                overflow: visible;
+            }
+
+            .v-list-item-title span {
+                padding-right: 1em;
+            }
+        }
+
+        .v-data-table {
+            user-select: none;
+
+            .v-data-table-rows-no-data td {
+                padding: 0 0.75em;
+                text-align: left;
+            }
+
+            .v-data-table__td {
+                overflow: visible;
+                padding-right: 1em;
+            }
+
+            .v-table__wrapper {
+                min-width: 100%;
+                width: fit-content;
+            }
+        }
+    }
+
+    .nova-mpl * {
+        resize: none !important;
+    }
+
+    .nova-readonly {
+        .v-select__menu-icon {
+            display: none;
+        }
+    }
+
+    .v-window {
+        display: flex;
+        flex: 1 1;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+
+        .v-window__container {
+            flex: 1 1;
+
+            .v-window-item {
+                flex: 1 1;
+            }
+        }
+    }
 
     .v-radio-group {
         border: 1px solid rgba(0, 0, 0, 0.3);
@@ -281,10 +271,17 @@ html {
         width: unset;
     }
 
-    .nova-data-selector .icon-btn {
-        height: 28px;
+    .v-progress-linear__content { pointer-events: all !important; }
+
+    @media only screen and (max-width: 959px) {
+        .d-grid {
+            /* This forces all grid rows to have the same height. If one doesn't want this to happen, then they should use the box layouts. :) */
+            grid-auto-rows: 1fr;
+            grid-template-columns: repeat(1, 1fr) !important;
+        }
+
+        .d-grid-item {
+            grid-column: 1 / 1 !important;
+        }
     }
 }
-
-
-.v-progress-linear__content { pointer-events: all !important; }
