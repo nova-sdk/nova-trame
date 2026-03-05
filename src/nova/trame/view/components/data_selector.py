@@ -30,8 +30,9 @@ class DataSelector(vuetify.VDataTableVirtual):
         v_model: Union[str, Tuple],
         directory: Union[str, Tuple],
         action: Union[str, Callable] = "",
-        action_icon: Union[str, Tuple] = "mdi-gesture-tap",
-        action_text: str = "Action",
+        action_header: str = "",
+        action_icon: Union[str, Tuple] = "",
+        action_visible: Union[bool, Tuple] = True,
         clear_selection_on_directory_change: Union[bool, Tuple] = True,
         extensions: Union[List[str], Tuple, None] = None,
         prefix: Union[str, Tuple] = "",
@@ -111,8 +112,9 @@ class DataSelector(vuetify.VDataTableVirtual):
             self._v_model_name_in_state = v_model[0].split(".")[0]
 
         self._action = action
+        self._action_header = action_header
         self._action_icon = action_icon
-        self._action_text = action_text
+        self._action_visible = TrameTuple.create(action_visible)
         self._clear_selection = clear_selection_on_directory_change
         self._directory = directory
         self._last_directory = get_state_param(self.state, self._directory)
@@ -195,7 +197,7 @@ class DataSelector(vuetify.VDataTableVirtual):
                             (
                                 "["
                                 "  { title: 'Available Datafiles', key: 'title' },"
-                                f" {{ title: '{self._action_text}', align: 'end', key: 'actions', sortable: false }}"
+                                f" {{ title: '{self._action_header}', align: 'end', key: 'actions', sortable: false }}"
                                 "]",
                             ),
                         )
@@ -221,6 +223,7 @@ class DataSelector(vuetify.VDataTableVirtual):
                     with self:
                         with vuetify.Template(raw_attrs=['''v-slot:item.actions="{ item }"''']):
                             with vuetify.VBtn(
+                                v_if=self._action_visible,
                                 variant="text",
                                 v_on_click_stop=(self._action, "[item]") if callable(self._action) else self._action,
                             ):
