@@ -1773,8 +1773,8 @@ packages:
   requires_python: '>=3.10,<3.14'
 - pypi: ./
   name: nova-trame
-  version: 1.5.0.dev2
-  sha256: c7e7ed48e32f1d6055950bc37c8be8c55784f8be4a470b0337f77d5cf5953ffa
+  version: 1.5.0.dev3
+  sha256: 079c0a87429b0dc9a1ca556d7361943f1fb742d85bad905a9904fd8dccdec096
   requires_dist:
   - altair
   - libsass

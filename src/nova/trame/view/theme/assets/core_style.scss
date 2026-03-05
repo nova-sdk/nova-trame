@@ -78,6 +78,10 @@
             .v-data-table__td {
                 overflow: visible;
                 padding-right: 1em;
+
+                &:not(:first-child) {
+                    padding-left: 0;
+                }
             }
 
             .v-table__wrapper {

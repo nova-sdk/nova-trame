@@ -30,7 +30,6 @@ class DataSelector(vuetify.VDataTableVirtual):
         v_model: Union[str, Tuple],
         directory: Union[str, Tuple],
         action: Union[str, Callable] = "",
-        action_header: str = "",
         action_icon: Union[str, Tuple] = "",
         action_visible: Union[bool, Tuple] = True,
         clear_selection_on_directory_change: Union[bool, Tuple] = True,
@@ -112,7 +111,6 @@ class DataSelector(vuetify.VDataTableVirtual):
             self._v_model_name_in_state = v_model[0].split(".")[0]
 
         self._action = action
-        self._action_header = action_header
         self._action_icon = action_icon
         self._action_visible = TrameTuple.create(action_visible)
         self._clear_selection = clear_selection_on_directory_change
@@ -191,21 +189,10 @@ class DataSelector(vuetify.VDataTableVirtual):
                 with VBoxLayout(
                     classes="position-relative", column_span=1 if show_directories else 2, gap="0.5em", stretch=True
                 ):
-                    if self._action:
-                        headers = kwargs.pop(
-                            "headers",
-                            (
-                                "["
-                                "  { title: 'Available Datafiles', key: 'title' },"
-                                f" {{ title: '{self._action_header}', align: 'end', key: 'actions', sortable: false }}"
-                                "]",
-                            ),
-                        )
-                    else:
-                        headers = kwargs.pop(
-                            "headers",
-                            ("[{ title: 'Available Datafiles', key: 'title' }]",),
-                        )
+                    headers = kwargs.pop(
+                        "headers",
+                        ("[{ title: 'Available Datafiles', key: 'title' }]",),
+                    )
                     super().__init__(
                         ref="test",
                         v_model=self._v_model,
@@ -221,13 +208,14 @@ class DataSelector(vuetify.VDataTableVirtual):
                         **kwargs,
                     )
                     with self:
-                        with vuetify.Template(raw_attrs=['''v-slot:item.actions="{ item }"''']):
+                        with vuetify.Template(raw_attrs=['''v-slot:item.title="{ item }"''']):
                             with vuetify.VBtn(
                                 v_if=self._action_visible,
                                 variant="text",
                                 v_on_click_stop=(self._action, "[item]") if callable(self._action) else self._action,
                             ):
                                 vuetify.VIcon(icon=self._action_icon, size=16)
+                            html.Span("{{ item.title }}")
                         with vuetify.Template(v_slot_no_data=True):
                             html.Span("No files to display.")
                     if self._label:
