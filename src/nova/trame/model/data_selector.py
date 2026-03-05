@@ -32,48 +32,16 @@ class DataSelectorModel:
             self.state.subdirectory = kwargs["subdirectory"]
 
     def sort_directories(self, directories: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        # Sort the current level of dictionaries
-        sorted_dirs = natsorted(directories, key=lambda x: x["title"])
-
-        # Process each sorted item to sort their children
-        for item in sorted_dirs:
-            if "children" in item and isinstance(item["children"], list):
-                item["children"] = self.sort_directories(item["children"])
-
-        return sorted_dirs
+        return natsorted(directories, key=lambda x: x["title"])
 
     def get_directories_from_path(self, base_path: Path) -> List[Dict[str, Any]]:
+        search_path = os.path.join(self.state.directory, base_path)
         directories = []
         try:
-            for dirpath, dirs, _ in os.walk(base_path):
-                # Get the relative path from the start path
-                path_parts = os.path.relpath(dirpath, base_path).split(os.sep)
-
-                if len(path_parts) > 1:
-                    dirs.clear()
-                elif path_parts != ["."]:
-                    # Subdirectories are fully queried upon being opened, so we only need to query one item to determine
-                    # if the target directory has any children.
-                    dirs[:] = dirs[:1]
-
-                # Only create a new entry for top-level directories
-                if len(path_parts) == 1 and path_parts[0] != ".":  # This indicates a top-level directory
-                    current_dir = {"path": dirpath, "title": path_parts[0]}
-                    directories.append(current_dir)
-
-                # Add subdirectories to the corresponding parent directory
-                elif len(path_parts) > 1:
-                    current_level: Any = directories
-                    for part in path_parts[:-1]:  # Parent directories
-                        for item in current_level:
-                            if item["title"] == part:
-                                if "children" not in item:
-                                    item["children"] = []
-                                current_level = item["children"]
-                                break
-
-                    # Add the last part (current directory) as a child
-                    current_level.append({"path": dirpath, "title": path_parts[-1]})
+            for entry in os.listdir(search_path):
+                entry_path = os.path.join(search_path, entry)
+                if os.path.isdir(entry_path):
+                    directories.append({"children": [], "path": entry_path, "title": entry})
         except OSError:
             pass
 
