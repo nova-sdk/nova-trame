@@ -160,7 +160,7 @@ class NeutronDataSelector(DataSelector):
         else:
             headers = "[{ title: 'Available Datafiles', key: 'title' },"
         if self._action:
-            headers += f"{{ title: '{self._action_text}', align: 'end', key: 'actions', sortable: false }}"
+            headers += f"{{ title: '{self._action_header}', align: 'end', key: 'actions', sortable: false }}"
         headers += "]"
 
         super().create_ui(headers=(headers,), **kwargs)
