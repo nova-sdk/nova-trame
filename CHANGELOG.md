@@ -1,3 +1,9 @@
+### nova-trame, 1.5.0
+
+* Add ability to specify actions on DataSelector files (thanks to John Duggan).
+* Moves button for clearing selected files to top right of DataSelector (thanks to John Duggan).
+* Queries DataSelector directories as needed upon open (thanks to John Duggan).
+
 ### nova-trame, 1.4.0
 
 * Revert the DataSelector datafile list to use a Vuetify virtual data table (thanks to John Duggan).

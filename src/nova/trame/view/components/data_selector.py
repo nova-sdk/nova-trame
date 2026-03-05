@@ -162,6 +162,10 @@ class DataSelector(vuetify.VDataTableVirtual):
                     vuetify.VIcon("mdi-refresh", size=16)
                     vuetify.VTooltip("Refresh Contents", activator="parent")
 
+                with vuetify.VBtn(icon=True, size="small", variant="text", click=self.reset):
+                    vuetify.VIcon("mdi-close-box-outline", size=16)
+                    vuetify.VTooltip("Clear All Selected Files", activator="parent")
+
             with GridLayout(columns=2, stretch=True):
                 if show_directories:
                     with VBoxLayout(stretch=True):
@@ -240,11 +244,6 @@ class DataSelector(vuetify.VDataTableVirtual):
                     vuetify.VChip("{{ item.title.split('/').reverse()[0] }}", v_if="index < 2")
                     html.Span(
                         f"(+{{{{ {self._v_model}.length - 2 }}}} others)", v_if="index === 2", classes="text-caption"
-                    )
-
-                with vuetify.Template(v_slot_append_inner=True):
-                    vuetify.VIcon(
-                        "mdi-close-box", v_if=f"{self._v_model}.length > 0", color="primary", size=20, click=self.reset
                     )
 
     def _create_model(self) -> None:
