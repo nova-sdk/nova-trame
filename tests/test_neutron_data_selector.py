@@ -1,6 +1,6 @@
 """Unit tests for NeutronDataSelector."""
 
-from typing import List
+from typing import Any, Dict, List
 from warnings import catch_warnings
 
 from pydantic import BaseModel, Field
@@ -8,6 +8,7 @@ from trame.app import get_server
 from trame_server.core import Server
 
 from nova.mvvm.trame_binding import TrameBinding
+from nova.trame.utils.types import TrameTuple
 from nova.trame.view.components.ornl import NeutronDataSelector
 from nova.trame.view.theme import ThemedApp
 
@@ -22,12 +23,21 @@ def test_data_selector() -> None:
         def create_ui(self) -> None:
             with super().create_ui() as layout:
                 with layout.content:
-                    input = NeutronDataSelector(v_model="test", extensions=[".tiff"])
+                    input = NeutronDataSelector(
+                        v_model="test",
+                        extensions=[".tiff"],
+                        action=self.test,
+                        action_icon="mdi-pencil",
+                        action_visible=True,
+                    )
                     assert input.v_model == "test"
                     assert input._extensions == [".tiff"]
                     assert input._model.state.facility == ""
                     assert input._model.state.instrument == ""
                     assert input._model.state.experiment == ""
+                    assert input._action == self.test
+                    assert input._action_icon == "mdi-pencil"
+                    assert input._action_visible == TrameTuple.create(True)
 
                     input.update_facility("HFIR")
                     input.update_instrument("BIO-SANS")
@@ -52,6 +62,9 @@ def test_data_selector() -> None:
                         raise AssertionError("set_state should fail to run")
                     except TypeError:
                         pass
+
+        def test(self, file: Dict[str, Any]) -> None:
+            pass
 
     MyTrameApp()
 
