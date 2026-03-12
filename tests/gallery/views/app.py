@@ -284,11 +284,16 @@ class ComponentTab:
                 )
             with VBoxLayout(classes="border-md", height=400, style="flex-shrink: 0 !important"):
                 try:
+
+                    def handle_click(file_path: str) -> None:
+                        print("User clicked action for", file_path)
+
                     NeutronDataSelector(
                         v_model="nds_oncat.selected_files",
                         data_source="oncat",
                         projection=["indexed.run_number", "metadata.entry.title"],
                         chips=True,
+                        action=handle_click,
                     )
                 except EnvironmentError:
                     # Unit tests will fail without this in the CI since ONCat vars won't be defined.

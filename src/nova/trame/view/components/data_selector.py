@@ -1,7 +1,7 @@
 """View Implementation for DataSelector."""
 
 from asyncio import ensure_future, sleep
-from typing import Any, List, Tuple, Union
+from typing import Any, Callable, List, Tuple, Union
 from warnings import warn
 
 from trame.app import get_server
@@ -29,6 +29,9 @@ class DataSelector(vuetify.VDataTableVirtual):
         self,
         v_model: Union[str, Tuple],
         directory: Union[str, Tuple],
+        action: Union[str, Callable] = "",
+        action_icon: Union[str, Tuple] = "",
+        action_visible: Union[bool, Tuple] = True,
         clear_selection_on_directory_change: Union[bool, Tuple] = True,
         extensions: Union[List[str], Tuple, None] = None,
         prefix: Union[str, Tuple] = "",
@@ -51,7 +54,15 @@ class DataSelector(vuetify.VDataTableVirtual):
         directory : Union[str, Tuple]
             The top-level folder to expose to users. Only contents of this directory and its children will be exposed to
             users.
-        clear_selection_on_directory_change: Union[bool, Tuple], optional
+        action : Union[str, Callable], optional
+            When set, adds a button next to each datafile title that triggers the provided callback when clicked. This
+            callback will be passed a dictionary containing the selected file's available information.
+        action_icon : Union[str, Tuple], optional
+            Sets the icon for each action button. A list of available icons can be found `here <https://pictogrammers.com/library/mdi/>`__.
+        action_visible : Union[bool, Tuple], optional
+            Adds a condition to use for checking if the action button should be shown for each datafile. By default, all
+            datafiles will show the action button.
+        clear_selection_on_directory_change : Union[bool, Tuple], optional
             Whether or not to clear the selected files when the directory is changed.
         extensions : Union[List[str], Tuple], optional
             A list of file extensions to restrict selection to. If unset, then all files will be shown.
@@ -107,6 +118,9 @@ class DataSelector(vuetify.VDataTableVirtual):
         else:
             self._v_model_name_in_state = v_model[0].split(".")[0]
 
+        self._action = action
+        self._action_icon = action_icon
+        self._action_visible = TrameTuple.create(action_visible)
         self._clear_selection = clear_selection_on_directory_change
         self._directory = directory
         self._last_directory = get_state_param(self.state, self._directory)
@@ -156,6 +170,10 @@ class DataSelector(vuetify.VDataTableVirtual):
                     vuetify.VIcon("mdi-refresh", size=16)
                     vuetify.VTooltip("Refresh Contents", activator="parent")
 
+                with vuetify.VBtn(icon=True, size="small", variant="text", click=self.reset):
+                    vuetify.VIcon("mdi-close-box-outline", size=16)
+                    vuetify.VTooltip("Clear All Selected Files", activator="parent")
+
             with GridLayout(columns=2, stretch=True):
                 if show_directories:
                     with VBoxLayout(stretch=True):
@@ -198,6 +216,14 @@ class DataSelector(vuetify.VDataTableVirtual):
                         **kwargs,
                     )
                     with self:
+                        with vuetify.Template(raw_attrs=['''v-slot:item.title="{ item }"''']):
+                            with vuetify.VBtn(
+                                v_if=self._action_visible,
+                                variant="text",
+                                v_on_click_stop=(self._action, "[item]") if callable(self._action) else self._action,
+                            ):
+                                vuetify.VIcon(icon=self._action_icon, size=16)
+                            html.Span("{{ item.title }}")
                         with vuetify.Template(v_slot_no_data=True):
                             html.Span("No files to display.")
                     if self._label:
@@ -217,11 +243,6 @@ class DataSelector(vuetify.VDataTableVirtual):
                     vuetify.VChip("{{ item.title.split('/').reverse()[0] }}", v_if="index < 2")
                     html.Span(
                         f"(+{{{{ {self._v_model}.length - 2 }}}} others)", v_if="index === 2", classes="text-caption"
-                    )
-
-                with vuetify.Template(v_slot_append_inner=True):
-                    vuetify.VIcon(
-                        "mdi-close-box", v_if=f"{self._v_model}.length > 0", color="primary", size=20, click=self.reset
                     )
 
     def _create_model(self) -> None:

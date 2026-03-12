@@ -1,6 +1,6 @@
 """Unit tests for DataSelector."""
 
-from typing import List
+from typing import Any, Dict, List
 
 import pytest
 from pydantic import BaseModel, Field
@@ -8,6 +8,7 @@ from trame.app import get_server
 from trame_server.core import Server
 
 from nova.mvvm.trame_binding import TrameBinding
+from nova.trame.utils.types import TrameTuple
 from nova.trame.view.components import DataSelector
 from nova.trame.view.theme import ThemedApp
 
@@ -23,10 +24,23 @@ async def test_data_selector() -> None:
         def create_ui(self) -> None:
             with super().create_ui() as layout:
                 with layout.content:
-                    input = DataSelector(v_model="test", directory="/", extensions=[".tiff"])
+                    input = DataSelector(
+                        v_model="test",
+                        directory="/",
+                        extensions=[".tiff"],
+                        action=self.test,
+                        action_icon="mdi-pencil",
+                        action_visible=True,
+                    )
                     assert input.v_model == "test"
                     assert input._directory == "/"
                     assert input._extensions == [".tiff"]
+                    assert input._action == self.test
+                    assert input._action_icon == "mdi-pencil"
+                    assert input._action_visible == TrameTuple.create(True)
+
+        def test(self, file: Dict[str, Any]) -> None:
+            pass
 
     MyTrameApp()
 
