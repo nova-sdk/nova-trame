@@ -54,7 +54,15 @@ class DataSelector(vuetify.VDataTableVirtual):
         directory : Union[str, Tuple]
             The top-level folder to expose to users. Only contents of this directory and its children will be exposed to
             users.
-        clear_selection_on_directory_change: Union[bool, Tuple], optional
+        action : Union[str, Callable], optional
+            When set, adds a button next to each datafile title that triggers the provided callback when clicked. This
+            callback will be passed a dictionary containing the selected file's available information.
+        action_icon : Union[str, Tuple], optional
+            Sets the icon for each action button. A list of available icons can be found `here <https://pictogrammers.com/library/mdi/>`__.
+        action_visible : Union[bool, Tuple], optional
+            Adds a condition to use for checking if the action button should be shown for each datafile. By default, all
+            datafiles will show the action button.
+        clear_selection_on_directory_change : Union[bool, Tuple], optional
             Whether or not to clear the selected files when the directory is changed.
         extensions : Union[List[str], Tuple], optional
             A list of file extensions to restrict selection to. If unset, then all files will be shown.

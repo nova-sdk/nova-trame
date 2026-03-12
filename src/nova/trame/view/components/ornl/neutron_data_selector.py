@@ -56,6 +56,14 @@ class NeutronDataSelector(DataSelector):
         v_model : Union[str, Tuple]
             The name of the state variable to bind to this widget. The state variable will contain a list of the files
             selected by the user.
+        action : Union[str, Callable], optional
+            When set, adds a button next to each datafile title that triggers the provided callback when clicked. This
+            callback will be passed a dictionary containing the selected file's available information.
+        action_icon : Union[str, Tuple], optional
+            Sets the icon for each action button. A list of available icons can be found `here <https://pictogrammers.com/library/mdi/>`__.
+        action_visible : Union[bool, Tuple], optional
+            Adds a condition to use for checking if the action button should be shown for each datafile. By default, all
+            datafiles will show the action button.
         allow_custom_directories : Union[bool, Tuple], optional
             Whether or not to allow users to provide their own directories to search for datafiles in. Ignored if the
             facility parameter is set.
