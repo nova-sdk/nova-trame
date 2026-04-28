@@ -24,6 +24,10 @@ class ConfigVM:
     def get_local_storage(self) -> str:
         return self.local_storage_state.value
 
+    def open_persistent_dialog(self) -> None:
+        self.config.open_dialog()
+        self.config_bind.update_in_view(self.config)
+
     def set_local_storage(self, value: Optional[str]) -> None:
         if value is not None:
             self.local_storage_state.value = value
