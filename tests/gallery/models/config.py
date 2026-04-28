@@ -16,6 +16,7 @@ class Config(BaseModel):
     selected_folder: str = Field(default="", title="Selected Folder")
     snackbar: bool = Field(default=True)
     active_tab: int = Field(default=0)
+    dialog_open: bool = Field(default=False)
     debounce_rate: int = Field(default=1000, title="Debounce Rate")
     debounce: str = Field(
         default="",
@@ -58,6 +59,9 @@ class Config(BaseModel):
             print(f"received throttled update: {text}")
 
         return text
+
+    def open_dialog(self) -> None:
+        self.dialog_open = True
 
 
 class LocalStorageState(BaseModel):

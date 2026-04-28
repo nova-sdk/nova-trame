@@ -1,3 +1,7 @@
+### nova-trame, 1.6.0
+
+* Adds a PersistentDialog component that allows creating persistent dialogs with more customization than default Vuetify VDialogs (thanks to John Duggan).
+
 ### nova-trame, 1.5.0
 
 * Add ability to specify actions on DataSelector files (thanks to John Duggan).

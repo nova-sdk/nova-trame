@@ -23,7 +23,7 @@ from nova.common.job import ToolOutputs, WorkState
 from nova.common.signals import Signal, ToolCommand, get_signal_id
 from nova.mvvm.trame_binding import TrameBinding
 from nova.trame import ThemedApp
-from nova.trame.view.components import DataSelector, FileUpload, InputField, RemoteFileInput
+from nova.trame.view.components import DataSelector, FileUpload, InputField, PersistentDialog, RemoteFileInput
 from nova.trame.view.components.execution_buttons import ExecutionButtons
 from nova.trame.view.components.ornl import NeutronDataSelector
 from nova.trame.view.components.progress_bar import ProgressBar
@@ -217,6 +217,9 @@ class ComponentTab:
                         vuetify.VBtn("Open Dialog", v_bind="props")
                     with vuetify.Template(v_slot_default=True):
                         vuetify.VCard(title="Dialog")
+                with PersistentDialog(v_model="config.dialog_open", max_width=500):
+                    vuetify.VCard(title="Dialog")
+                vuetify.VBtn("Persistent Dialog", click=self.view_model.open_persistent_dialog)
                 with html.Div():
                     html.Span("Divider")
                     vuetify.VDivider()
