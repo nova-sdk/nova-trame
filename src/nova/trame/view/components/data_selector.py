@@ -120,6 +120,8 @@ class DataSelector(vuetify.VDataTableVirtual):
 
         self._action = action
         self._action_icon = action_icon
+        if self._action == "":
+            action_visible = False
         self._action_visible = TrameTuple.create(action_visible)
         self._clear_selection = clear_selection_on_directory_change
         self._directory = directory
