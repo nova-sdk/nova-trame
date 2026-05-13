@@ -36,3 +36,22 @@ def test_inheritance() -> None:
                     vuetify.VBtn("Hello World")
 
     # [setup app complete]
+
+
+def test_nav_drawer() -> None:
+    from trame.widgets import vuetify3 as vuetify
+    from trame_server.core import Server
+
+    class MyTrameApp(ThemedApp):
+        def __init__(self, server: Server = None) -> None:
+            super().__init__(server=server)
+
+            self.create_ui()
+
+        def create_ui(self) -> None:
+            with super().create_ui() as layout:
+                with layout.content:
+                    vuetify.VBtn("Hello World")
+
+            with self.add_drawer(open=True, width=600):
+                assert layout.drawer == 600
