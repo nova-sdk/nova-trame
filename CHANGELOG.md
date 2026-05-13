@@ -1,3 +1,9 @@
+### nova-trame, 1.7.0
+
+* Adds `add_drawer` and `toggle_drawer` methods to `ThemedApp` to simplify creating navigation drawers (thanks to John Duggan).
+* Fixes a bug where long DataSelector file names would wrap incorrectly (thanks to John Duggan).
+* Fixes a bug where DataSelector action slots would render even if no action was defined (thanks to John Duggan).
+
 ### nova-trame, 1.6.0
 
 * Adds a PersistentDialog component that allows creating persistent dialogs with more customization than default Vuetify VDialogs (thanks to John Duggan).
