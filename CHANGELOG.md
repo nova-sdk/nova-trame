@@ -1,3 +1,7 @@
+### nova-trame, 1.7.1
+
+* Fixes alignment of the navigation drawer toggle button (thanks to John Duggan).
+
 ### nova-trame, 1.7.0
 
 * Adds `add_drawer` and `toggle_drawer` methods to `ThemedApp` to simplify creating navigation drawers (thanks to John Duggan).

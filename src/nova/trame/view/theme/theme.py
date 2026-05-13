@@ -254,16 +254,15 @@ class ThemedApp:
                     self.layout.drawer = drawer
 
         with self.layout.toolbar:
-            with vuetify.VAppBarNavIcon(flat=True, click=self.toggle_drawer):
+            with vuetify.VAppBarNavIcon(flat=True, click=self.toggle_drawer) as toggle_btn:
                 vuetify.VIcon("mdi-menu", size=20)
+                self.layout.toolbar.children.insert(0, toggle_btn)
+            self.layout.toolbar.children.pop()
 
         return self.layout.drawer
 
     def toggle_drawer(self) -> None:
         """Toggles the navigation drawer if enabled."""
-        if "nova__drawer" not in self.state:
-            return
-
         self.state.nova__drawer = not self.state.nova__drawer
 
     def create_ui(self) -> VAppLayout:
