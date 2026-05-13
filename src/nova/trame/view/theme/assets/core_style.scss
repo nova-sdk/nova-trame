@@ -82,6 +82,10 @@
                 &:not(:first-child) {
                     padding-left: 0;
                 }
+
+                span {
+                    white-space: nowrap;
+                }
             }
 
             .v-table__wrapper {

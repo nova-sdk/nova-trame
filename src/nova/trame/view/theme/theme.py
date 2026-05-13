@@ -8,7 +8,7 @@ import sys
 from asyncio import create_task
 from functools import partial
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 from warnings import warn
 
 import blinker
@@ -20,11 +20,13 @@ from trame.ui.vuetify3 import VAppLayout
 from trame.widgets import client
 from trame.widgets import vuetify3 as vuetify
 from trame_client.widgets import html
+from trame_client.widgets.core import AbstractElement
 from trame_server.core import Server
 from trame_server.state import State
 
 from nova.common.signals import Signal
 from nova.mvvm.pydantic_utils import validate_pydantic_parameter
+from nova.trame.view.layouts import VBoxLayout
 from nova.trame.view.theme.exit_button import ExitButton
 from nova.trame.view.utilities.local_storage import LocalStorageManager
 
@@ -40,15 +42,11 @@ class ThemedApp:
     You should always inherit from this class when you define your Trame application.
     """
 
-    def __init__(
-        self, layout: str = "default", server: Server = None, vuetify_config_overrides: Optional[dict] = None
-    ) -> None:
+    def __init__(self, server: Server = None, vuetify_config_overrides: Optional[dict] = None) -> None:
         """Constructor for the ThemedApp class.
 
         Parameters
         ----------
-        layout : str
-            The layout to use. Current options are: :code:`default` and :code:`two-column`
         server : `trame_server.core.Server \
             <https://trame.readthedocs.io/en/latest/core.server.html#trame_server.core.Server>`_, optional
             The Trame server to use. If not provided, a new server will be created.
@@ -154,13 +152,6 @@ class ThemedApp:
             }
         )
 
-    def init_mantid(self) -> None:
-        """Initializes MantidManager.
-
-        This doesn't happen by default because Mantid is a large dependency.
-        """
-        pass
-
     async def _init_theme(self) -> None:
         if self.local_storage:
             theme = await self.local_storage.get("nova__theme")
@@ -229,6 +220,52 @@ class ThemedApp:
         if self.state.nova__menu and self.local_storage:
             self.local_storage.set("nova__theme", theme)
 
+    def add_drawer(self, open: bool = False, **kwargs: Any) -> AbstractElement:
+        """Adds a navigation drawer to your layout.
+
+        You should always call this method from your application class that inherits from :code:`ThemedApp`.
+
+        Parameters
+        ----------
+        open : bool, optional
+            If true then the drawer will be open when the user first opens the page.
+        **kwargs : Any, optional
+            All other keyword arguments will be passed to the underlying VNavigationDrawer. Note that you cannot pass
+            v_model as nova-trame manages this directly. Instead, please call the `toggle_drawer` method.
+
+        Returns
+        -------
+        `trame_client.widgets.core.AbstractElement <https://trame.readthedocs.io/en/latest/core.widget.html#trame_client.widgets.core.AbstractElement>`_
+            A Trame element into which you can place your content using the `with` syntax.
+        """
+        self.state.nova__drawer = kwargs.pop("open", open)
+        with self.layout.pre_content:
+            with vuetify.VNavigationDrawer(
+                v_model="nova__drawer",
+                classes="d-flex flex-column " + kwargs.pop("classes", ""),
+                disable_resize_watcher=kwargs.pop("disable_resize_watcher", True),
+                disable_route_watcher=kwargs.pop("disable_route_watcher", True),
+                location=kwargs.pop("location", "left"),
+                sticky=kwargs.pop("sticky", True),
+                style="height: calc(100vh - 64px);" + kwargs.pop("style", ""),
+                **kwargs,
+            ):
+                with VBoxLayout(height="100%", stretch=True) as drawer:
+                    self.layout.drawer = drawer
+
+        with self.layout.toolbar:
+            with vuetify.VAppBarNavIcon(flat=True, click=self.toggle_drawer):
+                vuetify.VIcon("mdi-menu", size=20)
+
+        return self.layout.drawer
+
+    def toggle_drawer(self) -> None:
+        """Toggles the navigation drawer if enabled."""
+        if "nova__drawer" not in self.state:
+            return
+
+        self.state.nova__drawer = not self.state.nova__drawer
+
     def create_ui(self) -> VAppLayout:
         """Creates the base UI into which you will inject your content.
 
@@ -236,7 +273,7 @@ class ThemedApp:
 
         Returns
         -------
-        `trame_client.ui.core.AbstractLayout <https://trame.readthedocs.io/en/latest/core.ui.html#trame_client.ui.core.AbstractLayout>`_
+        `trame_client.ui.core.AbstractLayout <https://trame.readthedocs.io/en/latest/core.ui.html#trame_client.ui.core.AbstractLayout>`__
         """
         # This detects if Pixi is running in production mode so that we can show links to NOVA resources during
         # development.
@@ -372,4 +409,5 @@ class ThemedApp:
                     name = name.replace("[index]", f"[{str(index)}]")
                 return validate_pydantic_parameter(name, value)
 
+            self.layout = layout
             return layout
