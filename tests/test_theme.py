@@ -1,6 +1,6 @@
 """Tests theme.py."""
 
-from nova.trame import ThemedApp
+from nova.trame import ThemedApp, get_app
 
 
 def test_theme_configuration() -> None:
@@ -55,3 +55,11 @@ def test_nav_drawer() -> None:
 
             with self.add_drawer(open=True, width=600):
                 assert layout.drawer == 600
+
+
+def test_get_app() -> None:
+    app1 = ThemedApp()
+    app2 = ThemedApp(name="test")
+
+    assert app1 == get_app()
+    assert app2 == get_app("test")
