@@ -8,7 +8,7 @@ import sys
 from asyncio import create_task
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Dict, Optional
 from warnings import warn
 
 import blinker
@@ -42,11 +42,17 @@ class ThemedApp:
     You should always inherit from this class when you define your Trame application.
     """
 
-    def __init__(self, server: Server = None, vuetify_config_overrides: Optional[dict] = None) -> None:
+    instances: Dict[str, "ThemedApp"] = {}
+
+    def __init__(
+        self, name: str = "default", server: Server = None, vuetify_config_overrides: Optional[dict] = None
+    ) -> None:
         """Constructor for the ThemedApp class.
 
         Parameters
         ----------
+        name : str, optional
+            The name of this app. You can pass this to `get_app` to retrieve an instance reference.
         server : `trame_server.core.Server \
             <https://trame.readthedocs.io/en/latest/core.server.html#trame_server.core.Server>`_, optional
             The Trame server to use. If not provided, a new server will be created.
@@ -110,6 +116,8 @@ class ThemedApp:
         self.state.nova__defaults = self.vuetify_config["theme"]["themes"]["CompactTheme"].get("defaults", {})
         self.state.nova__theme = "CompactTheme"
         self.state.trame__favicon = LocalFileManager(__file__).url("favicon", "./assets/favicon.png")
+
+        ThemedApp.instances[name] = self
 
     @property
     def state(self) -> State:
@@ -410,3 +418,18 @@ class ThemedApp:
 
             self.layout = layout
             return layout
+
+
+def get_app(name: str = "default") -> Optional[ThemedApp]:
+    """Constructor for the ThemedApp class.
+
+    Parameters
+    ----------
+    name : str, optional
+        The name of the application instance to retrieve.
+
+    Returns
+    -------
+    Optional[ThemedApp]
+    """
+    return ThemedApp.instances.get(name, None)
