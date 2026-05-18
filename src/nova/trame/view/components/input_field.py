@@ -167,6 +167,8 @@ class InputField(AbstractElement):
             - autocomplete - Produces a dropdown menu that supports autocompletion as the user types. Items can be \
                 automatically populated (see select option for details).
             - autoscroll - Produces a textarea that automatically scrolls to the bottom as new content is added.
+            - button -  Note that all named arguments (e.g. v_model) will be ignored when using this. kwargs can still \
+                be used to customize the button.
             - checkbox
             - combobox - Produces a dropdown menu that supports autocompletion as the user types and allows users to \
                 add new items. Items can be automatically populated (see select option for details).
@@ -213,6 +215,9 @@ class InputField(AbstractElement):
         `trame_client.widgets.core.AbstractElement <https://trame.readthedocs.io/en/latest/core.widget.html#trame_client.widgets.core.AbstractElement>`_
             The Vuetify input component.
         """
+        if type == "button":
+            return vuetify.VBtn(**kwargs)
+
         server = get_server(None, client_type="vue3")
 
         kwargs = {
