@@ -106,9 +106,7 @@ class ComponentTab:
             html.P("GridLayout")
             # [ setup grid ]
             with GridLayout(classes="mb-4", columns=2, halign="center", valign="center"):
-                InputField(
-                    v_for="(item, index) in ['a', 'b', 'c', 'd']", text="{{ item }} - {{ index }}", type="button"
-                )
+                InputField(v_for="(item, index) in ['a', 'b', 'c', 'd']", text=("`${item} - ${index}`",), type="button")
             # [ setup grid complete ]
             html.P("HBoxLayout")
             # [ setup hbox ]
