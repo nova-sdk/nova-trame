@@ -22,6 +22,9 @@ def test_input_field() -> None:
     input_field = InputField(type="autocomplete")
     assert isinstance(input_field, vuetify.VAutocomplete)
 
+    input_field = InputField(type="button")
+    assert isinstance(input_field, vuetify.VBtn)
+
     input_field = InputField(type="checkbox")
     assert isinstance(input_field, vuetify.VCheckbox)
 

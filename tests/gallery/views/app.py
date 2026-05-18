@@ -60,7 +60,7 @@ class MplTest:
                 self.webagg_view = MatplotlibFigure(self.figure1, webagg=True)
             with HBoxLayout(stretch=True, style="overflow: hidden !important"):
                 self.svg_view = MatplotlibFigure(self.figure2)
-        vuetify.VBtn("Change MPL Figure", click=self.update)
+        InputField(text="Change MPL Figure", type="button", click=self.update)
 
     def update(self) -> None:
         if self.fig_type == "sin":
@@ -106,24 +106,23 @@ class ComponentTab:
             html.P("GridLayout")
             # [ setup grid ]
             with GridLayout(classes="mb-4", columns=2, halign="center", valign="center"):
-                vuetify.VBtn(
-                    "{{ item }} - {{ index }}",
-                    v_for="(item, index) in ['a', 'b', 'c', 'd']",
+                InputField(
+                    v_for="(item, index) in ['a', 'b', 'c', 'd']", text="{{ item }} - {{ index }}", type="button"
                 )
             # [ setup grid complete ]
             html.P("HBoxLayout")
             # [ setup hbox ]
             with HBoxLayout(classes="mb-4"):
-                vuetify.VBtn("Button 1")
-                vuetify.VBtn("Button 2")
-                vuetify.VBtn("Button 3")
+                InputField(text="Button 1", type="button")
+                InputField(text="Button 2", type="button")
+                InputField(text="Button 3", type="button")
             # [ setup hbox complete ]
             html.P("VBoxLayout")
             # [ setup vbox ]
             with VBoxLayout(classes="mb-4"):
-                vuetify.VBtn("Button 1")
-                vuetify.VBtn("Button 2")
-                vuetify.VBtn("Button 3")
+                InputField(text="Button 1", type="button")
+                InputField(text="Button 2", type="button")
+                InputField(text="Button 3", type="button")
             # [ setup vbox complete ]
 
             vuetify.VCardTitle("Advanced Layouts")
@@ -198,28 +197,21 @@ class ComponentTab:
 
             vuetify.VCardTitle("Containment Components")
             with GridLayout(columns=3, halign="center", valign="center"):
-                vuetify.VBtn(
-                    "Elevated Button",
-                )
-                vuetify.VBtn(
-                    icon="mdi-ab-testing",
-                )
-                vuetify.VBtn(
-                    "Text Button",
-                    variant="text",
-                )
+                InputField(text="Elevated Button", type="button")
+                InputField(icon="mdi-ab-testing", type="button")
+                InputField(text="Text Button", type="button", variant="text")
                 with vuetify.VBtnToggle():
-                    vuetify.VBtn("Button 1")
-                    vuetify.VBtn("Button 2")
+                    InputField(text="Button 1", type="button")
+                    InputField(text="Button 2", type="button")
                 vuetify.VChip("Chip")
                 with vuetify.VDialog(max_width=500):
                     with vuetify.Template(v_slot_activator="{ props }"):
-                        vuetify.VBtn("Open Dialog", v_bind="props")
+                        InputField(v_bind="props", text="Open Dialog", type="button")
                     with vuetify.Template(v_slot_default=True):
                         vuetify.VCard(title="Dialog")
                 with PersistentDialog(v_model="config.dialog_open", max_width=500):
                     vuetify.VCard(title="Dialog")
-                vuetify.VBtn("Persistent Dialog", click=self.view_model.open_persistent_dialog)
+                InputField(text="Persistent Dialog", type="button", click=self.view_model.open_persistent_dialog)
                 with html.Div():
                     html.Span("Divider")
                     vuetify.VDivider()
@@ -230,16 +222,16 @@ class ComponentTab:
                     vuetify.VListItem(subtitle="Lorem Ipsum", title="List Item 2")
                     with vuetify.VListItem(subtitle="Lorem Ipsum", title="List Item 3"):
                         # [ Vuetify class example start ]
-                        vuetify.VBtn("Button", classes="pr-1 mt-2")
+                        InputField(text="Button", type="button", classes="pr-1 mt-2")
                         # [ Vuetify class example end ]
                 with vuetify.VMenu():
                     with vuetify.Template(v_slot_activator="{ props }"):
-                        vuetify.VBtn("Open Menu", v_bind="props")
+                        InputField(v_bind="props", text="Open Menu", type="button")
                     with vuetify.VList():
                         vuetify.VListItem("Menu Item")
                 with vuetify.VTooltip(text="Tooltip"):
                     with vuetify.Template(v_slot_activator="{ props }"):
-                        vuetify.VBtn("Tooltip", v_bind="props")
+                        InputField(v_bind="props", text="Tooltip", type="button")
 
             vuetify.VCardTitle("Navigation Components")
             with GridLayout(classes="mb-4", columns=2, valign="center"):
@@ -324,7 +316,7 @@ class ComponentTab:
                         rows=1,
                         type="autoscroll",
                     )
-                    vuetify.VBtn("Add Line to Autoscroller", click=self.append_to_autoscroll)
+                    InputField(text="Add Line to Autoscroller", type="button", click=self.append_to_autoscroll)
                 InputField(type="checkbox", label="Checkbox")
                 InputField(type="radio", label="Radio Buttons", inline=True, items=("config.radio_items",))
                 InputField(type="file", label="File Upload")
@@ -398,7 +390,7 @@ class ComponentTab:
                     timeout=-1,
                 ):
                     with vuetify.Template(v_slot_actions=True):
-                        vuetify.VBtn("Close", click="snackbar = false")
+                        InputField(text="Close", type="button", click="snackbar = false")
 
             vuetify.VCardTitle("Visualization Components")
             self.plot = Interactive2DPlot(
@@ -418,10 +410,16 @@ class ComponentTab:
                     label="Local Storage Test",
                     width=400,
                 )
-                vuetify.VBtn(
-                    "Save to LocalStorage", classes="mr-2", id="local-storage-set", click=self.set_local_storage
+                InputField(
+                    classes="mr-2",
+                    id="local-storage-set",
+                    text="Save to LocalStorage",
+                    type="button",
+                    click=self.set_local_storage,
                 )
-                vuetify.VBtn("Clear LocalStorage", id="local-storage-remove", click=self.remove_local_storage)
+                InputField(
+                    id="local-storage-remove", text="Clear LocalStorage", type="button", click=self.remove_local_storage
+                )
 
             ProgressBar("test")
             ToolOutputWindows("test")
@@ -551,7 +549,7 @@ class App(ThemedApp):
 
             # [slot child example]
             with layout.actions:
-                vuetify.VBtn("Text Button")
+                InputField(text="Text Button", type="button")
             # [slot child example complete]
 
             with layout.pre_content:
