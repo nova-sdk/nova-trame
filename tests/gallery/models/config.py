@@ -10,7 +10,7 @@ class Config(BaseModel):
 
     autoscroll: str = Field(default="", title="Autoscroller")
     nested: Dict[str, str] = Field(default={"selected_file": ""})
-    select1: List[str] = Field(default=[], title="Select")
+    select1: List[str] = Field(default=["Option 1"], min_length=1, title="Select")
     select2: List[str] = Field(default=[], title="Select")
     selected_file: str = Field(default="", title="Selected File")
     selected_folder: str = Field(default="", title="Selected Folder")
@@ -26,6 +26,7 @@ class Config(BaseModel):
     radio_items: List[Dict[str, Union[str, int]]] = Field(
         default=[{"title": "Item 1", "value": 1}, {"title": "Item 2", "value": 2}]
     )
+    required_test: str = Field(default="test", min_length=1, title="Required Field")
     throttle: str = Field(
         default="",
         description="This field is throttled and will only update its state every 1 second.",

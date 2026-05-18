@@ -353,7 +353,7 @@ class ComponentTab:
                     InputField(v_model="config.validation_test[0][0]", id="validation-test", type="number")
                     InputField(v_model="config.validation_test[1][0]", type="number")
                     InputField(v_model="config.validation_test[2][0]", type="number")
-                    InputField(label="Required Field", required=True)
+                    InputField(v_model="config.required_test")
                     InputField(label="Optional Field")
                     InputField(
                         label="Text Only Optional Field",
