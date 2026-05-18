@@ -6,7 +6,9 @@ import re
 from enum import Enum
 from inspect import isclass
 from typing import Any, Dict, Tuple, Union
+from warnings import warn
 
+from annotated_types import MinLen
 from trame.app import get_server
 from trame.widgets import client
 from trame.widgets import vuetify3 as vuetify
@@ -14,10 +16,22 @@ from trame_client.widgets.core import AbstractElement
 from trame_server.controller import Controller
 from trame_server.state import State
 
-from nova.mvvm.pydantic_utils import ERROR_FIELD_NAME, get_field_info
+from nova.mvvm.pydantic_utils import ERROR_FIELD_NAME, FieldInfo, get_field_info
 from nova.trame._internal.utils import set_state_param
 
 logger = logging.getLogger(__name__)
+
+
+def extract_field_info(field: str, object_name_in_state: str) -> FieldInfo:
+    try:
+        field_name = ".".join(field.split(".")[1:])
+        if "[" in field_name:
+            index_field_name = re.sub(r"\[.*?\]", "[0]", field_name)
+            return get_field_info(f"{object_name_in_state}.{index_field_name}")
+        else:
+            return get_field_info(field)
+    except Exception as _:
+        return None
 
 
 def parse_v_model(v_model: Union[str, Tuple, None]) -> Tuple[str, str]:
@@ -50,16 +64,7 @@ class InputField(AbstractElement):
         if not v_model:
             return {}
         field, object_name_in_state = parse_v_model(v_model)
-        field_info = None
-        try:
-            field_name = ".".join(field.split(".")[1:])
-            if "[" in field_name:
-                index_field_name = re.sub(r"\[.*?\]", "[0]", field_name)
-                field_info = get_field_info(f"{object_name_in_state}.{index_field_name}")
-            else:
-                field_info = get_field_info(field)
-        except Exception as _:
-            pass
+        field_info = extract_field_info(field, object_name_in_state)
         label = ""
         help_dict: dict = {}
         placeholder = None
@@ -131,7 +136,6 @@ class InputField(AbstractElement):
     def __new__(
         cls,
         v_model: Union[str, Tuple, None] = None,
-        required: bool = False,
         debounce: Union[int, Tuple] = -1,
         throttle: Union[int, Tuple] = -1,
         type: str = "text",
@@ -147,10 +151,6 @@ class InputField(AbstractElement):
         v_model : Union[str, Tuple], optional
             The v-model for this component. If this references a Pydantic configuration variable, then this component
             will attempt to load a label, hint, and validation rules from the configuration for you automatically.
-        required : bool, optional
-            If true, the input will be visually marked as required and a required rule will be added to the end of the
-            rules list. This parameter will be removed in the future. Please use Pydantic to enforce validation of
-            required fields.
         debounce : Union[int, Tuple], optional
             Number of milliseconds to wait after the last user interaction with this field before attempting to update
             the Trame state. If set to 0, then no debouncing will occur. If set to -1, then the environment variable
@@ -215,6 +215,15 @@ class InputField(AbstractElement):
         `trame_client.widgets.core.AbstractElement <https://trame.readthedocs.io/en/latest/core.widget.html#trame_client.widgets.core.AbstractElement>`_
             The Vuetify input component.
         """
+        if "required" in kwargs:
+            warn(
+                (
+                    "The required parameter has been removed in favor of Pydantic's min_length option. This "
+                    "application may not enforce required rules properly."
+                ),
+                stacklevel=1,
+            )
+
         if type == "button":
             return vuetify.VBtn(**kwargs)
 
@@ -281,9 +290,7 @@ class InputField(AbstractElement):
         cls._setup_help(input, **kwargs)
 
         cls._check_rules(input)
-        if required:
-            cls._setup_required_label(input)
-            cls._setup_required_rule(input)
+        cls._setup_required_label(input)
 
         cls._setup_event_listeners(server.controller, input)
 
@@ -348,6 +355,17 @@ class InputField(AbstractElement):
 
     @staticmethod
     def _setup_required_label(input: AbstractElement) -> None:
+        if "v_model" not in input._py_attr:
+            return
+
+        field_info = extract_field_info(*parse_v_model(input.v_model))
+        if not field_info:
+            return
+
+        min_length = next((meta.min_length for meta in field_info.metadata if isinstance(meta, MinLen)), 0)
+        if min_length < 1:
+            return
+
         if input.label:
             input.label = f"{input.label}*"
         else:
@@ -368,19 +386,6 @@ class InputField(AbstractElement):
                         "}"
                     )
                 )
-
-    @staticmethod
-    def _setup_required_rule(input: AbstractElement) -> None:
-        # The rule needs to check that 1. the input has been touched by the user, and 2. the input is not empty.
-        required_rule = (
-            f"(value) => (!window.trame.refs['{input.ref}'].touched || value?.length > 0) || 'Field is required'"
-        )
-        if "rules" in input._py_attr and input.rules:
-            # Existing rules will be in format ("[rule1, rule2]",) and we need to append to this list
-            rule_end_index = input.rules[0].rindex("]")
-            input.rules = (f"{input.rules[0][:rule_end_index]}, {required_rule}{input.rules[0][rule_end_index:]}",)
-        else:
-            input.rules = (f"[{required_rule}]",)
 
     @staticmethod
     def _setup_event_listeners(ctrl: Controller, input: AbstractElement) -> None:
