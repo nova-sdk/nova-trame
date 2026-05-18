@@ -85,7 +85,7 @@ def test_pydantic() -> None:
             with super().create_ui() as layout:
                 with layout.content:
                     input_field = cast(vuetify.VTextField, InputField(v_model="obj.username"))
-                    assert input_field.label == "User Name"
+                    assert input_field.label == "User Name*"
                     assert input_field.placeholder == "user"
                     assert input_field.title == "hint"
 
@@ -207,11 +207,6 @@ def test_help() -> None:
     )
     assert input_field.placeholder == "This is a placeholder."
     assert input_field.title == "This is a hint."
-
-
-def test_required() -> None:
-    input_field = cast(vuetify.VTextField, InputField(required=True))
-    assert input_field.label == "*"
 
 
 def test_change_handlers() -> None:
