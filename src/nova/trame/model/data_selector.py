@@ -14,6 +14,7 @@ class DataSelectorState(BaseModel, validate_assignment=True):
     directory: str = Field(default="")
     extensions: List[str] = Field(default=[])
     search: str = Field(default="", title="Search")
+    show_search: bool = Field(default=False)
     subdirectory: str = Field(default="")
 
 
@@ -74,7 +75,7 @@ class DataSelectorModel:
                     else:
                         can_add = True
 
-                if self.state.search and self.state.search.lower() not in entry.name.lower():
+                if self.state.show_search and self.state.search and self.state.search.lower() not in entry.name.lower():
                     can_add = False
 
                 if can_add:
@@ -91,3 +92,6 @@ class DataSelectorModel:
 
     def set_subdirectory(self, subdirectory_path: str) -> None:
         self.state.subdirectory = subdirectory_path
+
+    def toggle_search(self) -> None:
+        self.state.show_search = not self.state.show_search

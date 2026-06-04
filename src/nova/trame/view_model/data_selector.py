@@ -67,6 +67,10 @@ class DataSelectorViewModel:
         self.model.set_subdirectory(subdirectory_path)
         self.update_view()
 
+    def toggle_search(self) -> None:
+        self.model.toggle_search()
+        self.update_view()
+
     def transform_datafiles(self, datafiles: List[Any]) -> List[Dict[str, str]]:
         for datafile in datafiles:
             datafile["title"] = os.path.basename(datafile["path"])
