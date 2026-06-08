@@ -77,12 +77,11 @@ class DataSelectorModel:
                     else:
                         can_add = True
 
-                if self.state.show_filter and self.state.filter:
+                if can_add and self.state.show_filter and self.state.filter:
                     if self.state.use_regex == [0]:
-                        if not bool(re.search(rf"{self.state.filter}", entry.name)):
-                            can_add = False
-                    elif self.state.filter.lower() not in entry.name.lower():
-                        can_add = False
+                        can_add = bool(re.search(rf"{self.state.filter}", entry.name))
+                    else:
+                        can_add = self.state.filter.lower() in entry.name.lower()
 
                 if can_add:
                     datafiles.append(entry.path)

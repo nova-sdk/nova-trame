@@ -135,12 +135,11 @@ class ONCatDataSelectorModel(NeutronDataSelectorModel):
             else:
                 can_add = True
 
-            if self.state.show_filter and self.state.filter:
+            if can_add and self.state.show_filter and self.state.filter:
                 if self.state.use_regex == [0]:
-                    if not bool(re.search(rf"{self.state.filter}", os.path.basename(path))):
-                        can_add = False
-                elif self.state.filter.lower() not in os.path.basename(path).lower():
-                    can_add = False
+                    can_add = bool(re.search(rf"{self.state.filter}", os.path.basename(path)))
+                else:
+                    can_add = self.state.filter.lower() in os.path.basename(path).lower()
 
             if can_add:
                 datafiles.append(self.create_datafile_obj(datafile_data, projection))
