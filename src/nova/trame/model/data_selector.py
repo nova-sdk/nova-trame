@@ -79,7 +79,7 @@ class DataSelectorModel:
 
                 if self.state.show_filter and self.state.filter:
                     if self.state.use_regex == [0]:
-                        if not bool(re.search(rf"{self.state.filter}", entry.name, flags=re.IGNORECASE)):
+                        if not bool(re.search(rf"{self.state.filter}", entry.name)):
                             can_add = False
                     elif self.state.filter.lower() not in entry.name.lower():
                         can_add = False

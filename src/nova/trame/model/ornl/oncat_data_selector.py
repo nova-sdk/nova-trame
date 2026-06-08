@@ -137,7 +137,7 @@ class ONCatDataSelectorModel(NeutronDataSelectorModel):
 
             if self.state.show_filter and self.state.filter:
                 if self.state.use_regex == [0]:
-                    if not bool(re.search(rf"{self.state.filter}", os.path.basename(path), flags=re.IGNORECASE)):
+                    if not bool(re.search(rf"{self.state.filter}", os.path.basename(path))):
                         can_add = False
                 elif self.state.filter.lower() not in os.path.basename(path).lower():
                     can_add = False
