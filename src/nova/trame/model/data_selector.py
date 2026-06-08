@@ -1,6 +1,7 @@
 """Model implementation for DataSelector."""
 
 import os
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -13,8 +14,10 @@ class DataSelectorState(BaseModel, validate_assignment=True):
 
     directory: str = Field(default="")
     extensions: List[str] = Field(default=[])
-    search: str = Field(default="", title="Search")
+    filter: str = Field(default="", title="Filter")
+    show_filter: bool = Field(default=False)
     subdirectory: str = Field(default="")
+    use_regex: List[int] = Field(default=[])
 
 
 class DataSelectorModel:
@@ -74,8 +77,11 @@ class DataSelectorModel:
                     else:
                         can_add = True
 
-                if self.state.search and self.state.search.lower() not in entry.name.lower():
-                    can_add = False
+                if can_add and self.state.show_filter and self.state.filter:
+                    if self.state.use_regex == [0]:
+                        can_add = bool(re.search(rf"{self.state.filter}", entry.name))
+                    else:
+                        can_add = self.state.filter.lower() in entry.name.lower()
 
                 if can_add:
                     datafiles.append(entry.path)
@@ -91,3 +97,6 @@ class DataSelectorModel:
 
     def set_subdirectory(self, subdirectory_path: str) -> None:
         self.state.subdirectory = subdirectory_path
+
+    def toggle_filter(self) -> None:
+        self.state.show_filter = not self.state.show_filter

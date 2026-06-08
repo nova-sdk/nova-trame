@@ -1,8 +1,9 @@
-### nova-trame, 1.8.0 (unreleased)
+### nova-trame, 1.8.0
 
 * Adds `nova.trame.get_app` to make it easier to access `ThemedApp` methods from child components (thanks to John Duggan).
 * `InputField` now supports `type="button"` for creating buttons (thanks to John Duggan).
 * `InputField` automatically visually indicates required fields in Pydantic (thanks to John Duggan).
+* `DataSelector` filtering has been moved from a dialog to a field above the file list (thanks to John Duggan).
 
 ### nova-trame, 1.7.1
 

@@ -137,6 +137,7 @@ class DataSelector(vuetify.VDataTableVirtual):
         self._state_name = f"nova__dataselector_{self._next_id}_state"
         self._directories_name = f"nova__dataselector_{self._next_id}_directories"
         self._datafiles_name = f"nova__dataselector_{self._next_id}_datafiles"
+        self._is_filtering_name = f"nova__dataselector_{self._next_id}_is_filtering"
 
         self._flush_state = f"flushState('{self._v_model_name_in_state}');"
         self._reset_state = client.JSEval(exec=f"{self._v_model} = []; {self._flush_state}").exec
@@ -159,14 +160,9 @@ class DataSelector(vuetify.VDataTableVirtual):
         with VBoxLayout(classes="nova-data-selector", stretch=True) as self._layout:
             with HBoxLayout(valign="center"):
                 self._layout.filter = html.Div(classes="flex-1-1")
-                with vuetify.VBtn(icon=True, size="small", variant="text"):
-                    vuetify.VIcon("mdi-magnify", size=16)
-                    vuetify.VTooltip("Search", activator="parent")
-
-                    with vuetify.VMenu(activator="parent", close_on_content_click=False):
-                        with vuetify.VCard(width=200):
-                            with vuetify.VCardText():
-                                InputField(v_model=f"{self._state_name}.search", variant="outlined")
+                with vuetify.VBtn(icon=True, size="small", variant="text", click=self._vm.toggle_filter):
+                    vuetify.VIcon("mdi-filter", size=16)
+                    vuetify.VTooltip("Filter", activator="parent")
 
                 with vuetify.VBtn(icon=True, size="small", variant="text", click=self.refresh_contents):
                     vuetify.VIcon("mdi-refresh", size=16)
@@ -199,6 +195,22 @@ class DataSelector(vuetify.VDataTableVirtual):
                 with VBoxLayout(
                     classes="position-relative", column_span=1 if show_directories else 2, gap="0.5em", stretch=True
                 ):
+                    with InputField(
+                        v_show=f"{self._state_name}.show_filter", v_model=f"{self._state_name}.filter", stretch=False
+                    ):
+                        with vuetify.Template(v_slot_append_inner=True):
+                            with vuetify.VBtnToggle(
+                                v_model=f"{self._state_name}.use_regex",
+                                classes="h-100",
+                                color="primary",
+                                multiple=True,
+                                size="x-small",
+                                tile=True,
+                                update_modelValue=f"flushState('{self._state_name}');",
+                            ):
+                                vuetify.VBtn(classes="border-none ma-0", icon="mdi-regex", width="2em")
+                                vuetify.VTooltip("Filter with Regular Expression", activator="parent")
+
                     headers = kwargs.pop(
                         "headers",
                         ("[{ title: 'Available Datafiles', key: 'title' }]",),

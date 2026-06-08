@@ -33,7 +33,9 @@ class NeutronDataSelectorViewModel(DataSelectorViewModel):
                 case "custom_directory":
                     self.reset()
                     self.update_view()
-                case "search":
+                case "filter":
+                    self.update_view()
+                case "use_regex":
                     self.update_view()
 
     def transform_datafiles(self, datafiles: List[Any]) -> List[Dict[str, str]]:
