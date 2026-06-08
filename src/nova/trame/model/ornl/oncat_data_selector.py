@@ -1,6 +1,7 @@
 """ONCat backend for NeutronDataSelector."""
 
 import os
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -134,8 +135,12 @@ class ONCatDataSelectorModel(NeutronDataSelectorModel):
             else:
                 can_add = True
 
-            if self.state.search and self.state.search.lower() not in os.path.basename(path).lower():
-                can_add = False
+            if self.state.show_filter and self.state.filter:
+                if self.state.use_regex == [0]:
+                    if not bool(re.search(rf"{self.state.filter}", os.path.basename(path), flags=re.IGNORECASE)):
+                        can_add = False
+                elif self.state.filter.lower() not in os.path.basename(path).lower():
+                    can_add = False
 
             if can_add:
                 datafiles.append(self.create_datafile_obj(datafile_data, projection))

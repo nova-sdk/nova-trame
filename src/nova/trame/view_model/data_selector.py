@@ -56,7 +56,7 @@ class DataSelectorViewModel:
 
     def on_state_updated(self, results: Dict[str, Any]) -> None:
         for result in results.get("updated", []):
-            if result == "search":
+            if result in ["filter", "use_regex"]:
                 self.update_view()
 
     def set_binding_parameters(self, **kwargs: Any) -> None:
@@ -67,8 +67,8 @@ class DataSelectorViewModel:
         self.model.set_subdirectory(subdirectory_path)
         self.update_view()
 
-    def toggle_search(self) -> None:
-        self.model.toggle_search()
+    def toggle_filter(self) -> None:
+        self.model.toggle_filter()
         self.update_view()
 
     def transform_datafiles(self, datafiles: List[Any]) -> List[Dict[str, str]]:

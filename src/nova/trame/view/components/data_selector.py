@@ -160,9 +160,9 @@ class DataSelector(vuetify.VDataTableVirtual):
         with VBoxLayout(classes="nova-data-selector", stretch=True) as self._layout:
             with HBoxLayout(valign="center"):
                 self._layout.filter = html.Div(classes="flex-1-1")
-                with vuetify.VBtn(icon=True, size="small", variant="text", click=self._vm.toggle_search):
-                    vuetify.VIcon("mdi-magnify", size=16)
-                    vuetify.VTooltip("Search", activator="parent")
+                with vuetify.VBtn(icon=True, size="small", variant="text", click=self._vm.toggle_filter):
+                    vuetify.VIcon("mdi-filter", size=16)
+                    vuetify.VTooltip("Filter", activator="parent")
 
                 with vuetify.VBtn(icon=True, size="small", variant="text", click=self.refresh_contents):
                     vuetify.VIcon("mdi-refresh", size=16)
@@ -195,9 +195,21 @@ class DataSelector(vuetify.VDataTableVirtual):
                 with VBoxLayout(
                     classes="position-relative", column_span=1 if show_directories else 2, gap="0.5em", stretch=True
                 ):
-                    InputField(
-                        v_show=f"{self._state_name}.show_search", v_model=f"{self._state_name}.search", stretch=False
-                    )
+                    with InputField(
+                        v_show=f"{self._state_name}.show_filter", v_model=f"{self._state_name}.filter", stretch=False
+                    ):
+                        with vuetify.Template(v_slot_append_inner=True):
+                            with vuetify.VBtnToggle(
+                                v_model=f"{self._state_name}.use_regex",
+                                classes="h-100",
+                                color="primary",
+                                multiple=True,
+                                size="x-small",
+                                tile=True,
+                                update_modelValue=f"flushState('{self._state_name}');",
+                            ):
+                                vuetify.VBtn(classes="border-none ma-0", icon="mdi-regex", width="2em")
+                                vuetify.VTooltip("Filter with Regular Expression", activator="parent")
 
                     headers = kwargs.pop(
                         "headers",
