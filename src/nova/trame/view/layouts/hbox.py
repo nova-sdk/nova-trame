@@ -1,8 +1,10 @@
 """Trame implementation of the HBoxLayout class."""
 
 from typing import Any, Optional, Union
+from warnings import warn
 
 from trame.widgets import html
+from trame_client.widgets.core import AbstractElement
 
 from .utils import merge_styles
 
@@ -110,3 +112,61 @@ class HBoxLayout(html.Div):
             styles["margin-bottom"] = vspace
 
         return styles
+
+    def add_child(self, child: Union[AbstractElement, str]) -> AbstractElement:
+        """Add a child to the box.
+
+        Do not call this directly. Instead, use Trame's `with` syntax, which will call this method internally. This
+        method is documented here as a reference for the halign, stretch, and valign parameters.
+
+        Parameters
+        ----------
+        child : `AbstractElement \
+            <https://trame.readthedocs.io/en/latest/core.widget.html#trame_client.widgets.core.AbstractElement>`_ | str
+            The child to add to the grid.
+        halign : str
+            NOTE: This parameter is valid at the box level but not for individual elements due to limitations in the CSS
+            flexbox. Instead, you can use `VSpacer <https://trame.readthedocs.io/en/latest/trame.widgets.vuetify3.html>`__
+            to add horizontal space between elements.
+        stretch : bool
+            Allows overriding the stretch parameter declared at the box level for a single child.
+        valign : str
+            Allows overriding the vertical alignment declared at the box level for a single child.
+
+        Returns
+        -------
+        None
+
+        Example
+        -------
+        .. literalinclude:: ../tests/gallery/views/app.py
+            :start-after: grid row and column span example
+            :end-before: grid row and column span example end
+            :dedent:
+        """
+        if isinstance(child, str):
+            child = html.Div(child)
+
+        if "style" not in child._py_attr or child.style is None:
+            child.style = ""
+        if "classes" not in child._py_attr or child.classes is None:
+            child.classes = ""
+
+        if "halign" in child._py_attr:
+            warn(
+                (
+                    "halign cannot change the horizontal alignment of individual elements in an HBoxLayout due to "
+                    "limitations in the CSS flexbox. Instead, use `trame.widgets.vuetify3.VSpacer` in between your "
+                    "elements to manipulate horizontal alignment."
+                ),
+                stacklevel=1,
+            )
+        if "stretch" in child._py_attr:
+            if child.stretch:
+                child.classes += " flex-1-1"
+            else:
+                child.classes += " flex-0-1"
+        if "valign" in child._py_attr:
+            child.style += f" align-self: {child.valign};"
+
+        super().add_child(child)

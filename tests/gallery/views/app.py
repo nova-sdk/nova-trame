@@ -89,6 +89,26 @@ class MplTest:
         ax.plot(t, s)
 
 
+class AlignmentTab:
+    """Tab for testing element self-alignment."""
+
+    def __init__(self, **kwargs: Any) -> None:
+        self.create_ui(**kwargs)
+
+    def create_ui(self, **kwargs: Any) -> None:
+        with VBoxLayout(stretch=True, **kwargs):
+            InputField(label="No Stretch", stretch=False)
+            InputField(label="Stretch")
+        with HBoxLayout(stretch=True, **kwargs):
+            InputField(text="Top Left", type="button", valign="start")
+            vuetify.VSpacer()
+            InputField(text="Bottom Right", type="button", valign="end")
+        with VBoxLayout(stretch=True, **kwargs):
+            InputField(text="Top Left", halign="start", type="button")
+            vuetify.VSpacer()
+            InputField(text="Bottom Right", halign="end", type="button")
+
+
 class ComponentTab:
     """Tab for holding the component gallery."""
 
@@ -555,10 +575,12 @@ class App(ThemedApp):
                     with vuetify.VTabs(v_model="config.active_tab", classes="pl-6"):
                         vuetify.VTab("Components", value=0)
                         vuetify.VTab("Full-screen Layout", value=1)
+                        vuetify.VTab("Alignment Tests", value=2)
 
             with layout.content:
                 ComponentTab(self.config_vm, self.local_storage, v_if="config.active_tab == 0")
                 FullScreenTab(v_if="config.active_tab == 1")
+                AlignmentTab(v_if="config.active_tab == 2")
 
             with layout.post_content:
                 html.Div("Sticky Bottom Content", classes="text-center w-100")

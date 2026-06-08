@@ -160,6 +160,11 @@ class GridLayout(html.Div):
         if isinstance(child, str):
             child = html.Div(child)
 
+        if "style" not in child._py_attr or child.style is None:
+            child.style = ""
+        if "classes" not in child._py_attr or child.classes is None:
+            child.classes = ""
+
         row_span = 1
         column_span = 1
         if "row_span" in child._py_attr:
@@ -167,12 +172,17 @@ class GridLayout(html.Div):
         if "column_span" in child._py_attr:
             column_span = child._py_attr["column_span"]
 
-        if "style" not in child._py_attr or child.style is None:
-            child.style = ""
         child.style += f"; {self.get_row_style(row_span)} {self.get_column_style(column_span)}"
-
-        if "classes" not in child._py_attr or child.classes is None:
-            child.classes = ""
         child.classes += " d-grid-item"
+
+        if "halign" in child._py_attr:
+            child.style += f" justify-self: {child.halign};"
+        if "stretch" in child._py_attr:
+            if child.stretch:
+                child.classes += " flex-1-1"
+            else:
+                child.classes += " flex-0-1"
+        if "valign" in child._py_attr:
+            child.style += f" align-self: {child.valign};"
 
         super().add_child(child)
