@@ -45,7 +45,8 @@ async def test_data_selector() -> None:
     MyTrameApp()
 
 
-def test_parameter_bindings() -> None:
+@pytest.mark.asyncio
+async def test_parameter_bindings() -> None:
     class TestModel(BaseModel):
         v_model: List[str] = Field(default=[])
         directory: str = Field(default="")
