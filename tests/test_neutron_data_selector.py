@@ -3,6 +3,7 @@
 from typing import Any, Dict, List
 from warnings import catch_warnings
 
+import pytest
 from pydantic import BaseModel, Field
 from trame.app import get_server
 from trame_server.core import Server
@@ -13,7 +14,8 @@ from nova.trame.view.components.ornl import NeutronDataSelector
 from nova.trame.view.theme import ThemedApp
 
 
-def test_data_selector() -> None:
+@pytest.mark.asyncio
+async def test_data_selector() -> None:
     class MyTrameApp(ThemedApp):
         def __init__(self, server: Server = None) -> None:
             server = get_server(None, client_type="vue3")
@@ -69,7 +71,8 @@ def test_data_selector() -> None:
     MyTrameApp()
 
 
-def test_parameter_bindings() -> None:
+@pytest.mark.asyncio
+async def test_parameter_bindings() -> None:
     class TestModel(BaseModel):
         v_model: List[str] = Field(default=[])
         facility: str = Field(default="")
