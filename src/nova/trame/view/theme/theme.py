@@ -28,6 +28,7 @@ from nova.common.signals import Signal
 from nova.mvvm.pydantic_utils import validate_pydantic_parameter
 from nova.trame.view.layouts import VBoxLayout
 from nova.trame.view.theme.exit_button import ExitButton
+from nova.trame.view.theme.help_box import HelpBox
 from nova.trame.view.utilities.local_storage import LocalStorageManager
 
 THEME_PATH = Path(__file__).parent
@@ -371,6 +372,7 @@ class ThemedApp:
                                                 "Selected",
                                                 v_if=f"nova__theme === '{theme['value']}'",
                                             )
+                            HelpBox()
                             ExitButton(self.exit_callback, self.get_jobs_callback)
 
                     with vuetify.VMain(classes="align-stretch d-flex flex-column h-screen"):

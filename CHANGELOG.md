@@ -1,3 +1,7 @@
+### nova-trame, 1.9.0
+
+* Tool version and documentation can now be displayed with environment variables (thanks to John Duggan).
+
 ### nova-trame, 1.8.0
 
 * Adds `nova.trame.get_app` to make it easier to access `ThemedApp` methods from child components (thanks to John Duggan).
