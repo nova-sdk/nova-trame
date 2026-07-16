@@ -189,8 +189,20 @@
         }
     }
 
+    .v-number-input__control {
+        .v-btn {
+            margin: 0;
+        }
+    }
+
     .v-tabs--horizontal {
         height: 32px !important;
+
+        .v-slide-group__content {
+            .v-btn {
+                margin-top: 0;
+            }
+        }
     }
 
     .v-tab.v-btn {

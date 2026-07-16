@@ -1,3 +1,7 @@
+### nova-trame, 1.9.1
+
+* Fix UI glitches in horizontal tabs and number inputs (thanks to John Duggan).
+
 ### nova-trame, 1.9.0
 
 * Tool version and documentation can now be displayed with environment variables (thanks to John Duggan).
