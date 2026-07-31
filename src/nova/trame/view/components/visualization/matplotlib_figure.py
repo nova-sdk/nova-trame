@@ -136,6 +136,7 @@ class MatplotlibFigure(matplotlib.Figure):
                 client.Style(content)
         js = FigureManagerWebAgg.get_javascript()
         client.Script(js.replace("window.setTimeout(set_focus, 100);", "//"))
+        client.Script(js.replace("if (fig.ratio !== 1) {", "if (true) {"))
 
         MatplotlibFigure.mpl_initialized = True
 
