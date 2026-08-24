@@ -1,3 +1,7 @@
+### nova-trame, 1.9.3
+
+* Ensure that RemoteFileInput filters are empty on page load (thanks to John Duggan).
+
 ### nova-trame, 1.9.2
 
 * Shims a bug fix for Matplotlib WebAgg figures into `MatplotlibFigure` until the bug is resolved in the upstream (thanks to John Duggan).
