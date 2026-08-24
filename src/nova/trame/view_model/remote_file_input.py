@@ -75,6 +75,7 @@ class RemoteFileInputViewModel:
         self.dialog_bind.update_in_view(False)
         self.valid_selection_bind.update_in_view(False)
         self.showing_all_bind.update_in_view(self.showing_all_files)
+        self.filter_bind.update_in_view("")
 
     def set_value(self, value: str) -> None:
         self.value = value
