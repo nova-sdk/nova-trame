@@ -35,15 +35,18 @@ jobs:
           file: dockerfiles/Dockerfile
           load: true
           target: source
-      - name: Run ruff check
-        run: docker run --rm ${{ steps.build.outputs.imageid }} ruff check
-      - name: Run format check
-        run: docker run --rm ${{ steps.build.outputs.imageid }} ruff format --check
-      - name: Run mypy
-        run: docker run --rm ${{ steps.build.outputs.imageid }} mypy .
-      - name: Unit tests
-        run: docker run --rm ${{ steps.build.outputs.imageid }} pytest
-      - name: Run coverage
-        run: docker run --rm ${{ steps.build.outputs.imageid }} sh -c "coverage run && coverage report"
-      - name: Docs test
-        run: docker run --rm ${{ steps.build.outputs.imageid }} bash build_docs.sh
+      - parallel:
+        - name: Run ruff check
+          run: docker run --rm ${{ steps.build.outputs.imageid }} ruff check
+        - name: Run format check
+          run: docker run --rm ${{ steps.build.outputs.imageid }} ruff format --check
+        - name: Run mypy
+          run: docker run --rm ${{ steps.build.outputs.imageid }} mypy .
+        - name: Unit tests (Trame v4)
+          run: docker run --rm ${{ steps.build.outputs.imageid }} pytest
+        - name: Unit tests (Trame v3)
+          run: docker run --rm ${{ steps.build.outputs.imageid }} --environment trame3 pytest
+        - name: Run coverage
+          run: docker run --rm ${{ steps.build.outputs.imageid }} sh -c "coverage run && coverage report"
+        - name: Docs test
+          run: docker run --rm ${{ steps.build.outputs.imageid }} bash build_docs.sh
