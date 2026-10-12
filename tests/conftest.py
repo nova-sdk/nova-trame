@@ -7,6 +7,8 @@ from typing import Generator
 
 from pytest import fixture
 from selenium.webdriver import Firefox, FirefoxOptions
+from trame.app import get_server
+from trame_client.widgets.core import HTML_CTX
 
 from tests.gallery import main
 
@@ -34,3 +36,19 @@ def driver() -> Generator[Firefox, None, None]:
     yield _setup_selenium()
 
     server_process.terminate()
+
+
+@fixture(autouse=True)
+def ambient_server() -> Generator[None, None, None]:
+    """Publish a server for tests that build widgets outside of an app.
+
+    As of trame-client v4 a widget resolves its rendering implementation from its server during __init__, so
+    constructing one with no server in scope raises. Tests that drive the gallery through Selenium are
+    unaffected; this only covers the ones that instantiate components directly.
+    """
+    previous = HTML_CTX._server
+    HTML_CTX._server = get_server("tests", client_type="vue3")
+
+    yield
+
+    HTML_CTX._server = previous

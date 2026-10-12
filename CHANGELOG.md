@@ -1,3 +1,7 @@
+### nova-trame, 1.10.0
+
+* Adds support for Trame v4 (thanks to John Duggan).
+
 ### nova-trame, 1.9.3
 
 * Ensure that RemoteFileInput filters are empty on page load (thanks to John Duggan).

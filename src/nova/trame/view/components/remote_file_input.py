@@ -12,7 +12,7 @@ from trame_server.core import State
 
 from nova.mvvm._internal.utils import rgetdictvalue
 from nova.mvvm.trame_binding import TrameBinding
-from nova.trame._internal.utils import get_state_name, get_state_param, set_state_param
+from nova.trame._internal.utils import get_state_name, get_state_param, get_widget_kwarg, set_state_param
 from nova.trame.model.remote_file_input import RemoteFileInputModel
 from nova.trame.view.layouts import VBoxLayout
 from nova.trame.view_model.remote_file_input import RemoteFileInputViewModel
@@ -112,8 +112,9 @@ class RemoteFileInput:
                 **self.input_props,
             ),
         ) as input:
-            if isinstance(input.classes, str):
-                input.classes += " nova-remote-file-input"
+            classes = get_widget_kwarg(input, "classes")
+            if isinstance(classes, str):
+                input.classes = f"{classes} nova-remote-file-input"
             else:
                 input.classes = "nova-remote-file-input"
             self.vm.init_view()

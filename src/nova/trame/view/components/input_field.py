@@ -17,7 +17,7 @@ from trame_server.controller import Controller
 from trame_server.state import State
 
 from nova.mvvm.pydantic_utils import ERROR_FIELD_NAME, FieldInfo, get_field_info
-from nova.trame._internal.utils import set_state_param
+from nova.trame._internal.utils import get_widget_kwarg, set_state_param
 
 logger = logging.getLogger(__name__)
 
@@ -298,13 +298,15 @@ class InputField(AbstractElement):
 
     @staticmethod
     def _check_rules(input: AbstractElement) -> None:
-        if "rules" in input._py_attr and input.rules and not isinstance(input.rules, tuple):
-            raise ValueError(f"Rules for '{input.label}' must be a tuple")
+        rules = get_widget_kwarg(input, "rules")
+        if rules and not isinstance(rules, tuple):
+            raise ValueError(f"Rules for '{get_widget_kwarg(input, 'label')}' must be a tuple")
 
     @staticmethod
     def _setup_autoscroll(state: State, input: AbstractElement) -> None:
-        if input.v_model:
-            if "id" not in input._py_attr or input.id is None:
+        v_model = get_widget_kwarg(input, "v_model")
+        if v_model:
+            if get_widget_kwarg(input, "id") is None:
                 input.id = f"nova__{input._id}"
             input.scroll = f"window.nova__autoscroll('{input.id}');"
 
@@ -342,7 +344,7 @@ class InputField(AbstractElement):
                 )
             ).exec
 
-            @state.change(input.v_model.split(".")[0])
+            @state.change(v_model.split(".")[0])
             def _autoscroll(**kwargs: Any) -> None:
                 autoscroll(input.id)
 
@@ -355,10 +357,11 @@ class InputField(AbstractElement):
 
     @staticmethod
     def _setup_required_label(input: AbstractElement) -> None:
-        if "v_model" not in input._py_attr:
+        v_model = get_widget_kwarg(input, "v_model")
+        if v_model is None:
             return
 
-        field_info = extract_field_info(*parse_v_model(input.v_model))
+        field_info = extract_field_info(*parse_v_model(v_model))
         if not field_info:
             return
 
@@ -366,19 +369,21 @@ class InputField(AbstractElement):
         if min_length < 1:
             return
 
-        if input.label:
-            input.label = f"{input.label}*"
+        label = get_widget_kwarg(input, "label")
+        if label:
+            input.label = f"{label}*"
         else:
             input.label = "*"
 
     @staticmethod
     def _setup_ref(input: AbstractElement) -> None:
-        if "ref" not in input._py_attr or input.ref is None:
+        if get_widget_kwarg(input, "ref") is None:
             input.ref = f"nova__{input._id}"
 
-        if "v_model" in input._py_attr and input.v_model is not None:
+        v_model = get_widget_kwarg(input, "v_model")
+        if v_model is not None:
             with input:
-                _, object_name_in_state = parse_v_model(input.v_model)
+                _, object_name_in_state = parse_v_model(v_model)
                 client.ClientTriggers(
                     mounted=(
                         f"if (window.trame.state.state?.{object_name_in_state}?.{ERROR_FIELD_NAME}?.length > 0) {{"
@@ -389,9 +394,7 @@ class InputField(AbstractElement):
 
     @staticmethod
     def _setup_event_listeners(ctrl: Controller, input: AbstractElement) -> None:
-        base_handler = None
-        if "change" in input._py_attr and input.change is not None:
-            base_handler = input.change
+        base_handler = get_widget_kwarg(input, "change")
 
         # Iterate over all saved refs and perform validation if there is a value that can be validated.
         change_handler = (
