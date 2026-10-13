@@ -1,7 +1,6 @@
 """Unit tests for InputField."""
 
 from enum import Enum
-from time import sleep
 from typing import cast
 
 from pydantic import BaseModel, Field
@@ -92,34 +91,63 @@ def test_pydantic() -> None:
     MyTrameApp()
 
 
+def get_validation_message(driver: Firefox, field_id: str) -> str:
+    return driver.execute_script(
+        """
+        const messages_content = document.getElementById(arguments[0] + "-messages");
+
+        return messages_content ? messages_content.textContent : "";
+        """,
+        field_id,
+    )
+
+
+def wait_for_validation_message(driver: Firefox, field_id: str, expected: str) -> None:
+    """Wait for a field to display a validation message.
+
+    Validation round trips to the server, so the message can't be read synchronously after typing.
+    """
+    WebDriverWait(driver, 10).until(
+        lambda _: expected in get_validation_message(driver, field_id),
+        f"'{expected}' never appeared in the messages for #{field_id}",
+    )
+
+
+def wait_for_pydantic_error(driver: Firefox, object_name: str, field_name: str) -> None:
+    """Wait for the server to reject a field and push its error list back to the client.
+
+    Rejected updates make the server resend its copy of the whole bound object, which overwrites
+    anything typed in the meantime. Tests must let that round trip land before typing again.
+    """
+    WebDriverWait(driver, 10).until(
+        lambda _: field_name
+        in (
+            driver.execute_script(
+                "return (window.trame.state.state[arguments[0]] || {}).pydantic_errors || [];",
+                object_name,
+            )
+        ),
+        f"{object_name}.{field_name} was never reported as invalid",
+    )
+
+
 def test_pydantic_validation(driver: Firefox) -> None:
-    sleep(1)
     input_field = WebDriverWait(driver, 10).until(
         expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#pydantic-field"))
     )
     input_field.send_keys("test")
-    sleep(1)
-    error_message = driver.execute_script("""
-        const messages_content = document.getElementById("pydantic-field-messages");
-
-        return messages_content.textContent;
-    """)
-
-    assert error_message.startswith("Input should be a valid integer")
+    wait_for_validation_message(driver, "pydantic-field", "Input should be a valid integer")
 
     input_field_2 = WebDriverWait(driver, 10).until(
         expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "#validation-test"))
     )
+    # Clearing the field sends an empty value that the server rejects, so settle that round trip
+    # before typing the value we actually want to validate.
     input_field_2.clear()
+    wait_for_pydantic_error(driver, "config", "validation_test[0][0]")
+
     input_field_2.send_keys("-1")
-    sleep(1)
-    error_message = driver.execute_script("""
-        const messages_content = document.getElementById("validation-test-messages");
-
-        return messages_content.textContent;
-    """)
-
-    assert "Error at indices 0,0" in error_message
+    wait_for_validation_message(driver, "validation-test", "Error at indices 0,0")
 
 
 def test_items_attributes() -> None:
