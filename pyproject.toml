@@ -1,6 +1,6 @@
 [project]
 name = "nova-trame"
-version = "1.9.3"
+version = "1.10.0"
 description = "A Python Package for injecting curated themes and custom components into Trame applications"
 authors = [
     { name = "John Duggan", email = "dugganjw@ornl.gov" },
@@ -19,7 +19,7 @@ dependencies = [
     "mpld3>=0.5.11,<0.6",
     "tomli",
     "tornado>=6.5.0",
-    "trame",
+    "trame<5",
     "trame-datagrid",
     "trame-matplotlib",
     "trame-plotly",
@@ -45,12 +45,18 @@ platforms = ["linux-64", "osx-64"]
 [tool.pixi.environments]
 default = {features = ["dev"], solve-group = "default"}
 production = {features = [], solve-group = "default"}
+# nova-trame supports both Trame v3 and v4, so CI runs the test suite against each. The default environment
+# resolves to the latest Trame; this one holds it back to the latest v3.
+trame3 = {features = ["dev", "trame3"], solve-group = "trame3"}
 
 [tool.pixi.dependencies]
 
 [tool.pixi.pypi-dependencies]
 nova-trame = { path = ".", editable = true }
 hatch = "*"
+
+[tool.pixi.feature.trame3.pypi-dependencies]
+trame = "<4"
 
 [tool.pixi.feature.dev.pypi-dependencies]
 mypy = ">=1.10.0,<2"

@@ -14,7 +14,8 @@ WORKDIR /src
 
 RUN curl -fsSL https://pixi.sh/install.sh | sh
 ENV PATH="/root/.pixi/bin:${PATH}"
-RUN pixi install
+# trame3 holds Trame back to the latest v3 so CI can test against both supported major versions.
+RUN pixi install -e default -e trame3
 SHELL [ "pixi", "run" ]
 ENTRYPOINT [ "pixi", "run" ]
 

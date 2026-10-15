@@ -6,6 +6,8 @@ from warnings import warn
 from trame.widgets import html
 from trame_client.widgets.core import AbstractElement
 
+from nova.trame._internal.utils import get_widget_kwarg
+
 from .utils import merge_styles
 
 
@@ -62,6 +64,8 @@ class HBoxLayout(html.Div):
             :end-before: setup hbox complete
             :dedent:
         """
+        self._unstyled_children: list[AbstractElement] = []
+
         classes = kwargs.pop("classes", [])
         if isinstance(classes, list):
             classes = " ".join(classes)
@@ -147,26 +151,43 @@ class HBoxLayout(html.Div):
         if isinstance(child, str):
             child = html.Div(child)
 
-        if "style" not in child._py_attr or child.style is None:
-            child.style = ""
-        if "classes" not in child._py_attr or child.classes is None:
-            child.classes = ""
-
-        if "halign" in child._py_attr:
-            warn(
-                (
-                    "halign cannot change the horizontal alignment of individual elements in an HBoxLayout due to "
-                    "limitations in the CSS flexbox. Instead, use `trame.widgets.vuetify3.VSpacer` in between your "
-                    "elements to manipulate horizontal alignment."
-                ),
-                stacklevel=1,
-            )
-        if "stretch" in child._py_attr:
-            if child.stretch:
-                child.classes += " flex-1-1"
-            else:
-                child.classes += " flex-0-1"
-        if "valign" in child._py_attr:
-            child.style += f" align-self: {child.valign};"
+        # trame-client v4 connects a widget to its parent before processing the widget's own kwargs, so the
+        # per-child overrides below aren't readable yet. Defer the styling to render time, by which point
+        # every child is fully constructed.
+        self._unstyled_children.append(child)
 
         super().add_child(child)
+
+    @property
+    def html(self) -> str:
+        self._style_children()
+
+        return super().html
+
+    def _style_children(self) -> None:
+        while self._unstyled_children:
+            child = self._unstyled_children.pop(0)
+
+            if get_widget_kwarg(child, "style") is None:
+                child.style = ""
+            if get_widget_kwarg(child, "classes") is None:
+                child.classes = ""
+
+            if get_widget_kwarg(child, "halign") is not None:
+                warn(
+                    (
+                        "halign cannot change the horizontal alignment of individual elements in an HBoxLayout due to "
+                        "limitations in the CSS flexbox. Instead, use `trame.widgets.vuetify3.VSpacer` in between your "
+                        "elements to manipulate horizontal alignment."
+                    ),
+                    stacklevel=1,
+                )
+            stretch = get_widget_kwarg(child, "stretch")
+            if stretch is not None:
+                if stretch:
+                    child.classes += " flex-1-1"
+                else:
+                    child.classes += " flex-0-1"
+            valign = get_widget_kwarg(child, "valign")
+            if valign is not None:
+                child.style += f" align-self: {valign};"

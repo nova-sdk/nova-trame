@@ -6,6 +6,8 @@ from warnings import warn
 from trame.widgets import html
 from trame_client.widgets.core import AbstractElement
 
+from nova.trame._internal.utils import get_widget_kwarg
+
 from .utils import merge_styles
 
 
@@ -71,6 +73,8 @@ class GridLayout(html.Div):
             :end-before: setup complex layout example complete
             :dedent:
         """
+        self._unstyled_children: list[AbstractElement] = []
+
         classes = kwargs.pop("classes", [])
         if isinstance(classes, list):
             classes = " ".join(classes)
@@ -160,29 +164,43 @@ class GridLayout(html.Div):
         if isinstance(child, str):
             child = html.Div(child)
 
-        if "style" not in child._py_attr or child.style is None:
-            child.style = ""
-        if "classes" not in child._py_attr or child.classes is None:
-            child.classes = ""
-
-        row_span = 1
-        column_span = 1
-        if "row_span" in child._py_attr:
-            row_span = child._py_attr["row_span"]
-        if "column_span" in child._py_attr:
-            column_span = child._py_attr["column_span"]
-
-        child.style += f"; {self.get_row_style(row_span)} {self.get_column_style(column_span)}"
-        child.classes += " d-grid-item"
-
-        if "halign" in child._py_attr:
-            child.style += f" justify-self: {child.halign};"
-        if "stretch" in child._py_attr:
-            if child.stretch:
-                child.classes += " flex-1-1"
-            else:
-                child.classes += " flex-0-1"
-        if "valign" in child._py_attr:
-            child.style += f" align-self: {child.valign};"
+        # trame-client v4 connects a widget to its parent before processing the widget's own kwargs, so the
+        # per-child overrides below aren't readable yet. Defer the styling to render time, by which point
+        # every child is fully constructed.
+        self._unstyled_children.append(child)
 
         super().add_child(child)
+
+    @property
+    def html(self) -> str:
+        self._style_children()
+
+        return super().html
+
+    def _style_children(self) -> None:
+        while self._unstyled_children:
+            child = self._unstyled_children.pop(0)
+
+            if get_widget_kwarg(child, "style") is None:
+                child.style = ""
+            if get_widget_kwarg(child, "classes") is None:
+                child.classes = ""
+
+            row_span = get_widget_kwarg(child, "row_span", 1)
+            column_span = get_widget_kwarg(child, "column_span", 1)
+
+            child.style += f"; {self.get_row_style(row_span)} {self.get_column_style(column_span)}"
+            child.classes += " d-grid-item"
+
+            halign = get_widget_kwarg(child, "halign")
+            if halign is not None:
+                child.style += f" justify-self: {halign};"
+            stretch = get_widget_kwarg(child, "stretch")
+            if stretch is not None:
+                if stretch:
+                    child.classes += " flex-1-1"
+                else:
+                    child.classes += " flex-0-1"
+            valign = get_widget_kwarg(child, "valign")
+            if valign is not None:
+                child.style += f" align-self: {valign};"
