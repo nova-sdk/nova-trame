@@ -1,5 +1,7 @@
 """Tests theme.py."""
 
+import pytest
+
 from nova.trame import ThemedApp, get_app
 
 
@@ -63,3 +65,35 @@ def test_get_app() -> None:
 
     assert app1 == get_app()
     assert app2 == get_app("test")
+
+
+@pytest.mark.asyncio
+async def test_client_disconnected() -> None:
+    class MyTrameApp(ThemedApp):
+        def __init__(self) -> None:
+            super().__init__(name="disconnect_test")
+
+            self.client_disconnect_timeout = 0.01
+            self.disconnected = False
+
+        async def on_client_disconnected(self) -> None:
+            self.disconnected = True
+
+    app = MyTrameApp()
+    monitor = app._connection_monitor
+
+    monitor.onConnect(None, "client_1")
+    monitor.onConnect(None, "client_2")
+    monitor.onClose("client_1")
+    assert monitor._timeout_task is None  # Another client is still connected.
+
+    monitor.onClose("client_2")
+    assert monitor._timeout_task is not None  # The last client disconnected, so the timeout is now running.
+
+    monitor.onConnect(None, "client_3")
+    assert monitor._timeout_task is None  # The client reconnected, so the timeout was cancelled.
+
+    monitor.onClose("client_3")
+    assert monitor._timeout_task is not None
+    await monitor._timeout_task  # Waiting on the task itself keeps this from racing the event loop.
+    assert app.disconnected

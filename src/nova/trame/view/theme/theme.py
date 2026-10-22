@@ -27,11 +27,13 @@ from trame_server.state import State
 from nova.common.signals import Signal
 from nova.mvvm.pydantic_utils import validate_pydantic_parameter
 from nova.trame.view.layouts import VBoxLayout
+from nova.trame.view.theme.connection_monitor import ClientConnectionMonitor
 from nova.trame.view.theme.exit_button import ExitButton
 from nova.trame.view.theme.help_box import HelpBox
 from nova.trame.view.utilities.local_storage import LocalStorageManager
 
 THEME_PATH = Path(__file__).parent
+CLIENT_DISCONNECT_TIMEOUT = 3600  # one hour
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -79,6 +81,10 @@ class ThemedApp:
         self.server = get_server(server, client_type="vue3")
         self.local_storage: Optional[LocalStorageManager] = None
         self._download_file: Optional[Callable] = None
+
+        self._connection_monitor = ClientConnectionMonitor(CLIENT_DISCONNECT_TIMEOUT, self.on_client_disconnected)
+        self.server.add_protocol_to_configure(lambda protocol: protocol.registerLinkProtocol(self._connection_monitor))
+
         if vuetify_config_overrides is None:
             vuetify_config_overrides = {}
 
@@ -123,6 +129,38 @@ class ThemedApp:
     @property
     def state(self) -> State:
         return self.server.state
+
+    @property
+    def client_disconnect_timeout(self) -> float:
+        """How long to wait, in seconds, before calling :code:`on_client_disconnected`. Defaults to one hour.
+
+        You can set this in your application's constructor to change the timeout.
+        """
+        return self._connection_monitor.timeout
+
+    @client_disconnect_timeout.setter
+    def client_disconnect_timeout(self, timeout: float) -> None:
+        self._connection_monitor.timeout = timeout
+
+    async def on_client_disconnected(self) -> None:
+        """Called once every client has been disconnected for :code:`client_disconnect_timeout` seconds.
+
+        By default this exits your application, on the assumption that a user who hasn't reconnected has abandoned it.
+        This covers both clean exits (closing the browser tab) and dropped connections (loss of network, the user's
+        machine going to sleep, etc.). If a client reconnects before the timeout elapses, then this will not be called.
+
+        Override this method in your application class if you need to perform your own cleanup when a user abandons
+        your application. Your override replaces the shutdown, so call
+        :code:`await super().on_client_disconnected()` from it if you still want your application to exit.
+
+        Note that this is only called after a client has disconnected, so it will not be called if nobody ever connects
+        to your application.
+
+        Returns
+        -------
+        None
+        """
+        await self.exit_callback()
 
     def download_file(self, filename: str, mimetype: str, content: bytes) -> None:
         """Attempts to download a file via the browser to the user's computer.
