@@ -1,3 +1,7 @@
+### nova-trame, 1.11.0
+
+* `ThemedApp.on_client_disconnected` can be overridden to run logic once all clients have been disconnected for a configurable amount of time (thanks to John Duggan).
+
 ### nova-trame, 1.10.0
 
 * Adds support for Trame v4 (thanks to John Duggan).
