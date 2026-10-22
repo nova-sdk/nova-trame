@@ -9,7 +9,7 @@ from nova.trame.view.components.visualization import Interactive2DPlot
 def test_interactive_2d_plot() -> None:
     # [setup 2d plot]
     from altair import Chart, selection_interval
-    from vega_datasets import data
+    from altair.datasets import data
 
     brush = selection_interval(name="brush")
     chart = (
