@@ -9,6 +9,7 @@ from typing import Any, Optional
 import blinker
 import numpy as np
 from altair import Chart, X, Y, selection_interval
+from altair.datasets import data
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from trame.app import get_server
@@ -17,7 +18,6 @@ from trame.widgets import client, html
 from trame.widgets import vuetify3 as vuetify
 from trame_server.core import Server
 from trame_server.state import State
-from vega_datasets import data
 
 from nova.common.job import ToolOutputs, WorkState
 from nova.common.signals import Signal, ToolCommand, get_signal_id

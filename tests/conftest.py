@@ -60,8 +60,11 @@ def driver() -> Generator[Firefox, None, None]:
 
     _wait_for_server()
 
-    yield _setup_selenium()
+    driver = _setup_selenium()
 
+    yield driver
+
+    driver.quit()
     server_process.terminate()
 
 
