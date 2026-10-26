@@ -84,6 +84,11 @@ class ThemedApp:
 
         self._connection_monitor = ClientConnectionMonitor(CLIENT_DISCONNECT_TIMEOUT, self.on_client_disconnected)
         self.server.add_protocol_to_configure(lambda protocol: protocol.registerLinkProtocol(self._connection_monitor))
+        # Start counting down as soon as the server is ready so that an app nobody connects to is cleaned up too.
+        self.server.controller.on_server_ready.add(lambda **_: self._connection_monitor.schedule_timeout())
+        # Trame reaps idle servers after five minutes, which would shut us down before on_client_disconnected runs.
+        # We hand that job to ClientConnectionMonitor, while still honoring an explicit --timeout from the user.
+        self.server.cli.set_defaults(timeout=0)
 
         if vuetify_config_overrides is None:
             vuetify_config_overrides = {}
@@ -153,8 +158,8 @@ class ThemedApp:
         your application. Your override replaces the shutdown, so call
         :code:`await super().on_client_disconnected()` from it if you still want your application to exit.
 
-        Note that this is only called after a client has disconnected, so it will not be called if nobody ever connects
-        to your application.
+        The timeout also starts when your application's server becomes ready, so this will be called even if nobody
+        ever connects to your application.
 
         Returns
         -------

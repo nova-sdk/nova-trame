@@ -17,6 +17,9 @@ class ClientConnectionMonitor(LinkProtocol):
     Trame's :code:`on_client_exited` lifecycle hook is sent by the browser as the page is unloaded, so it never fires
     when a connection simply drops (the user's machine goes to sleep, the network goes away, the tab is discarded).
     We watch the websocket connections directly instead so that any kind of disconnect is caught.
+
+    The timeout is also started once the server is ready, so an application that nobody ever connects to will be
+    cleaned up as well.
     """
 
     def __init__(self, timeout: float, callback: Callable[[], Any]) -> None:
@@ -35,10 +38,12 @@ class ClientConnectionMonitor(LinkProtocol):
     # wslink expects a camel-case name here :(
     def onClose(self, client_id: str) -> None:  # noqa: N802
         self._client_ids.discard(client_id)
-        if not self._client_ids:
-            self.schedule_timeout()
+        self.schedule_timeout()
 
     def schedule_timeout(self) -> None:
+        if self._client_ids:
+            return  # We only count down while nobody is connected.
+
         self.cancel_timeout()
 
         try:

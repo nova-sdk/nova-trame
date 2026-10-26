@@ -40,8 +40,10 @@ If you installed via Pixi, you can run the above script with:
 
 .. code-block:: bash
 
-    pixi run python my_trame_app.py [--server] [--timeout=0]
+    pixi run python my_trame_app.py [--server]
 
 After running this, if you point your browser to http://localhost:8080, then you should see a basic web application with our default theme and a button that says "Hello World".
 
-The two optional arguments are passed to the Trame server. :code:`--server` will prevent Trame from opening a new browser tab on launch, and :code:`--timeout=0` will tell the server to never close due to inactivity.
+The optional :code:`--server` argument is passed to the Trame server and will prevent Trame from opening a new browser tab on launch.
+
+By default your application will shut itself down one hour after the last client disconnects (or one hour after startup if nobody ever connects). See :code:`ThemedApp.client_disconnect_timeout` and :code:`ThemedApp.on_client_disconnected` if you need to change the timeout or what happens when it elapses.

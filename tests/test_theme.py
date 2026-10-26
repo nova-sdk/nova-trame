@@ -97,3 +97,38 @@ async def test_client_disconnected() -> None:
     assert monitor._timeout_task is not None
     await monitor._timeout_task  # Waiting on the task itself keeps this from racing the event loop.
     assert app.disconnected
+
+
+@pytest.mark.asyncio
+async def test_client_never_connected() -> None:
+    class MyTrameApp(ThemedApp):
+        def __init__(self) -> None:
+            super().__init__(name="never_connected_test")
+
+            self.client_disconnect_timeout = 0.01
+            self.disconnected = False
+
+        async def on_client_disconnected(self) -> None:
+            self.disconnected = True
+
+    app = MyTrameApp()
+    monitor = app._connection_monitor
+
+    # Trame calls this with the server state as kwargs once the server is listening.
+    app.server.controller.on_server_ready()
+    assert monitor._timeout_task is not None  # Nobody has connected, so the timeout is already running.
+
+    await monitor._timeout_task
+    assert app.disconnected
+
+    monitor.onConnect(None, "client_1")
+    app.server.controller.on_server_ready()
+    assert monitor._timeout_task is None  # A client beat the server ready callback, so we don't count down.
+
+
+def test_trame_idle_timeout_disabled() -> None:
+    app = ThemedApp(name="timeout_test")
+
+    # Trame would otherwise reap the server before on_client_disconnected runs.
+    assert app.server.cli.parse_known_args()[0].timeout == 0
+    assert app.server.cli.parse_known_args(["--timeout", "30"])[0].timeout == 30
